@@ -14,11 +14,11 @@ var upgrader = websocket.Upgrader{}
 
 type Message struct {
 	Username string `json:"username"`
-	Message string `json:"message"`
+	Message  string `json:"message"`
 }
 
 func main() {
-	fs := http.FileServer(http.Dir("public7"))
+	fs := http.FileServer(http.Dir("public"))
 	http.Handle("/", fs)
 	http.HandleFunc("/ws", handleConnections)
 	go handleMessages()
