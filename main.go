@@ -7,7 +7,7 @@ import (
 
 	"github.com/gorilla/websocket"
 
-	"./db"
+	// "./db"
 )
 
 var clients = make(map[*websocket.Conn]bool)
@@ -52,11 +52,26 @@ func print_headers(w http.ResponseWriter, r *http.Request) {
 	}
 	*/
 }
-	
+
+func getSessionId(r *http.Request) {
+	log.Println(*r.Cookie)
+}
+
+func chat(w http.ResponseWriter, r *http.Request) {
+	getSessionId(r)
+	// user, err := db.GetUser("qauvlf92vwvebalbhmi7e1h6ycujtlgd")
+	// if err != nil {
+	// 	log.Println(err)
+	// }
+	// log.Println(user)
+	print_headers(w, r)
+
+}
 
 func main() {
-	db.GetUser("qauvlf92vwvebalbhmi7e1h6ycujtlgd")
-	// fs := http.FileServer(http.Dir("public"))
+	http.Handle("/chat", http.HandlerFunc(chat))
+
+	// 
 	// http.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 	// 	log.Println("serving file...")
 	// 	fs.ServeHTTP(w, r)
@@ -66,11 +81,11 @@ func main() {
 
 	// http.HandleFunc("/ws", handleConnections)
 	// go handleMessages()
-	// log.Print("http server started on :8080")
-	// err := http.ListenAndServe(":8080", nil)
-	// if err != nil {
-	// 	log.Fatal("ListenAndServe: ", err)
-	// }
+	log.Print("http server started on :8080")
+	err := http.ListenAndServe(":8080", nil)
+	if err != nil {
+		log.Fatal("ListenAndServe: ", err)
+	}
 }
 
 func handleConnections(w http.ResponseWriter, r *http.Request) {

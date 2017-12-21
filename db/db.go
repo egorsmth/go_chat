@@ -2,7 +2,6 @@ package db
 
 import (
 	"database/sql"
-	"log"
 	"fmt"
 	"time"
 	"encoding/base64"
@@ -11,45 +10,64 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func checAndExit(err error, db *sql.DB) {
-	if err != nil {
-		log.Fatal(err)
-		panic(err)
-	}
-}
-
-func dec(str string) string {
+func dec(str string) (string, error) {
 	data, err := base64.StdEncoding.DecodeString(str)
 	if err != nil {
-		fmt.Println("error:", err)
-		panic(err)
+		return "", err
 	}
-	return string(data)
+	return string(data), nil
 }
 
-type User struct {
+type UserSess struct {
 	Auth_user_hash *string `json:"_auth_user_hash"`
 	Auth_user_id *string `json:"_auth_user_id"`
 	Auth_user_backend *string `json:"_auth_user_backend"`
 }
-func GetUser(sessionKey string) {
+
+type User struct {
+	id *int
+	username *string
+}
+
+func genUser(user *UserSess, session_data string) error {
+	decoded, err := dec(session_data)
+	if err != nil {
+		return err
+	}
+	data := strings.SplitN(decoded, ":", 2)
+	err = json.Unmarshal([]byte(data[1]), &user)
+	return err
+}
+
+func GetUser(sessionKey string) (*User, error) {
 	dbinfo := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable",
 		"root", "root", "social_net")
 	db, err := sql.Open("postgres", dbinfo)
-	checAndExit(err, db)
+	if err != nil {
+		return nil, err
+	}
 	defer db.Close()
-	row := db.QueryRow("select * from django_session where session_key='"+ sessionKey +"'")
+
+	row := db.QueryRow("select * from django_session where session_key=$1", sessionKey)
 	var session_key string
     var session_data string
     var expire_data time.Time
 	err = row.Scan(&session_key, &session_data, &expire_data)
-	checAndExit(err, db)
-	//fmt.Printf("%v | %v | %v\n", session_key, session_data, expire_data)
-	data := strings.SplitN(dec(session_data), ":", 2)
-	u := User{}
-	err = json.Unmarshal([]byte(data[1]), &u)
 	if err != nil {
-		fmt.Print(err)
+		return nil, err
 	}
-	fmt.Print(*u.Auth_user_id)
+
+	user := UserSess{}
+	err = genUser(&user, session_data)
+	if err != nil {
+		return nil, err
+	}
+
+	row = db.QueryRow("select id, username from auth_user where id=$1", *user.Auth_user_id)
+	userDb := User{}
+	err = row.Scan(&userDb.id, &userDb.username)
+	if err != nil {
+		return nil, err
+	}
+	return &userDb, nil
 }
