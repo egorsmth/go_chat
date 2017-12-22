@@ -4,10 +4,11 @@ import (
 	"log"
     "net/http"
     "sort"
-
+	"html/template"
+	"os"
 	"github.com/gorilla/websocket"
 
-	// "./db"
+	"./db"
 )
 
 var clients = make(map[*websocket.Conn]bool)
@@ -53,23 +54,38 @@ func print_headers(w http.ResponseWriter, r *http.Request) {
 	*/
 }
 
-func getSessionId(r *http.Request) {
-	log.Println(*r.Cookie)
-}
-
 func chat(w http.ResponseWriter, r *http.Request) {
-	getSessionId(r)
-	// user, err := db.GetUser("qauvlf92vwvebalbhmi7e1h6ycujtlgd")
-	// if err != nil {
-	// 	log.Println(err)
-	// }
-	// log.Println(user)
-	print_headers(w, r)
+	sid, err := r.Cookie("sessionid")
+	if err != nil {
+		
+	}
+	user, err := db.GetUser(sid.Value)
+	if err != nil {
+		log.Println(err)
+	}
+
+	if _, err := os.Stat("public/chat.html"); err == nil {
+		log.Println("exist")
+	}
+
+	t := template.New("chat") // Create a template.
+	t = template.Must(t.ParseFiles("public/chat.html"))  // Parse template file.
+	if err != nil {
+		log.Println("parse file err:", err)
+	}
+	err = t.Execute(w, user)
+	if err != nil {
+		log.Println("template Execute err:", err)
+	}
+	
+	//print_headers(w, r)
 
 }
 
 func main() {
 	http.Handle("/chat", http.HandlerFunc(chat))
+	fs := http.FileServer(http.Dir("public"))
+	http.Handle("/", fs)
 
 	// 
 	// http.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

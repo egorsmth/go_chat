@@ -25,8 +25,8 @@ type UserSess struct {
 }
 
 type User struct {
-	id *int
-	username *string
+	Id *int
+	Username *string
 }
 
 func genUser(user *UserSess, session_data string) error {
@@ -65,7 +65,7 @@ func GetUser(sessionKey string) (*User, error) {
 
 	row = db.QueryRow("select id, username from auth_user where id=$1", *user.Auth_user_id)
 	userDb := User{}
-	err = row.Scan(&userDb.id, &userDb.username)
+	err = row.Scan(&userDb.Id, &userDb.Username)
 	if err != nil {
 		return nil, err
 	}
