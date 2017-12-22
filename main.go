@@ -84,6 +84,7 @@ func chat(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	http.Handle("/chat", http.HandlerFunc(chat))
+	//http.Handle("/chat-room", http.HandlerFunc(chatRoom))
 	fs := http.FileServer(http.Dir("public"))
 	http.Handle("/", fs)
 
