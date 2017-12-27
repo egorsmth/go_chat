@@ -54,12 +54,17 @@ func print_headers(w http.ResponseWriter, r *http.Request) {
 	*/
 }
 
+type ChatResponse struct {
+	User *db.User
+	ChatRooms *[]db.UserToChatRoom
+}
+
 func chat(w http.ResponseWriter, r *http.Request) {
 	sid, err := r.Cookie("sessionid")
 	if err != nil {
 		
 	}
-	user, err := db.GetUser(sid.Value)
+	user, err := db.GetUserFromSession(sid.Value)
 	if err != nil {
 		log.Println(err)
 	}
@@ -73,7 +78,10 @@ func chat(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println("parse file err:", err)
 	}
-	err = t.Execute(w, user)
+	cr := ChatResponse{}
+	cr.User = user
+	cr.ChatRooms, err = db.GetChatRooms(user)
+	err = t.Execute(w, cr)
 	if err != nil {
 		log.Println("template Execute err:", err)
 	}
@@ -83,6 +91,7 @@ func chat(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	db.Init("user=root password=root dbname=social_net sslmode=disable")
 	http.Handle("/chat", http.HandlerFunc(chat))
 	//http.Handle("/chat-room", http.HandlerFunc(chatRoom))
 	fs := http.FileServer(http.Dir("public"))

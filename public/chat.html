@@ -5,17 +5,19 @@
     </head>
     <body>
         <div>
-            username is: {{.user.Username}}!
+            username is: {{.User.Username}}!
         </div>
         <div>
-            {{range .chatRooms}}
+            asdasdasd
+            {{range .ChatRooms}}
                 <a href="/chat_room?id={{.roomId}}">    
                     <div>
-                        <p>{{.username}}</p>
-                        <p>{{.message}}</p>
+                        <p>{{.UserId}}</p>
+                        <p>{{.ChatRoomId}}</p>
                     </div>
                 </a>
             {{end}}
+            zxczxcxzc
         </div>
     </body>
 </html>
