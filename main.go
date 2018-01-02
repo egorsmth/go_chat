@@ -5,12 +5,12 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-	"os"
 	"sort"
 
 	"github.com/gorilla/websocket"
 
-	"./db"
+	"./models"
+	"./shared"
 )
 
 var clients = make(map[*websocket.Conn]bool)
@@ -54,9 +54,9 @@ func printHeaders(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-type ChatResponse struct {
-	User      *db.User
-	ChatRooms *[]db.UserToChatRoom
+type chatResponse struct {
+	User      *models.User
+	ChatRooms *[]models.UserToChatRoom
 }
 
 func chat(w http.ResponseWriter, r *http.Request) {
@@ -65,14 +65,10 @@ func chat(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		// redirect tp login if no session
 	}
-	user, err := db.GetUserFromSession(sid.Value)
+	user, err := models.GetUserFromSession(sid.Value)
 	if err != nil {
-		log.Println(err)
+		log.Println("In main GetUserFromSession error:", err)
 		// redirect tp login if no session
-	}
-
-	if _, err := os.Stat("public/chat.html"); err == nil {
-		log.Println("exist")
 	}
 
 	t := template.New("chat")                           // Create a template.
@@ -80,9 +76,9 @@ func chat(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println("parse file err:", err)
 	}
-	cr := ChatResponse{}
+	cr := chatResponse{}
 	cr.User = user
-	cr.ChatRooms, err = db.GetChatRooms(user)
+	cr.ChatRooms, err = models.GetChatRooms(user)
 	err = t.Execute(w, cr)
 	if err != nil {
 		log.Println("template Execute err:", err)
@@ -93,7 +89,7 @@ func chat(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	db.Init("user=root password=root dbname=social_net sslmode=disable")
+	shared.Init("user=root password=root dbname=social_net sslmode=disable")
 	http.Handle("/chat", http.HandlerFunc(chat))
 	//http.Handle("/chat-room", http.HandlerFunc(chatRoom))
 	fs := http.FileServer(http.Dir("public"))
