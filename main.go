@@ -1,11 +1,13 @@
 package main
 
 import (
-	"log"
-    "net/http"
-    "sort"
+	"fmt"
 	"html/template"
+	"log"
+	"net/http"
 	"os"
+	"sort"
+
 	"github.com/gorilla/websocket"
 
 	"./db"
@@ -21,7 +23,7 @@ type Message struct {
 	Message  string `json:"message"`
 }
 
-func print_headers(w http.ResponseWriter, r *http.Request) {
+func printHeaders(w http.ResponseWriter, r *http.Request) {
 	// adding debug header to test (strong/weak) ETags in combination with NGINX
 	w.Header().Set("ETag", "HelloWorld")
 
@@ -46,35 +48,35 @@ func print_headers(w http.ResponseWriter, r *http.Request) {
 		log.Println(k, ":", r.Header[k])
 	}
 
-	/*
 	fmt.Fprintln(w, "<b>Response Headers:</b></br>")
 	for _, k := range responseKeys {
 		fmt.Fprintln(w, k, ":", k, "</br>")
 	}
-	*/
 }
 
 type ChatResponse struct {
-	User *db.User
+	User      *db.User
 	ChatRooms *[]db.UserToChatRoom
 }
 
 func chat(w http.ResponseWriter, r *http.Request) {
 	sid, err := r.Cookie("sessionid")
 	if err != nil {
-		
+		log.Println(err)
+		// redirect tp login if no session
 	}
 	user, err := db.GetUserFromSession(sid.Value)
 	if err != nil {
 		log.Println(err)
+		// redirect tp login if no session
 	}
 
 	if _, err := os.Stat("public/chat.html"); err == nil {
 		log.Println("exist")
 	}
 
-	t := template.New("chat") // Create a template.
-	t = template.Must(t.ParseFiles("public/chat.html"))  // Parse template file.
+	t := template.New("chat")                           // Create a template.
+	t = template.Must(t.ParseFiles("public/chat.html")) // Parse template file.
 	if err != nil {
 		log.Println("parse file err:", err)
 	}
@@ -85,8 +87,8 @@ func chat(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println("template Execute err:", err)
 	}
-	
-	//print_headers(w, r)
+
+	//printHeaders(w, r)
 
 }
 
@@ -97,7 +99,7 @@ func main() {
 	fs := http.FileServer(http.Dir("public"))
 	http.Handle("/", fs)
 
-	// 
+	//
 	// http.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 	// 	log.Println("serving file...")
 	// 	fs.ServeHTTP(w, r)
@@ -127,7 +129,7 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 		var msg Message
 		err := ws.ReadJSON(&msg)
 		if err != nil {
-			log.Printf("error: &v", err)
+			log.Fatal(err)
 			delete(clients, ws)
 			break
 		}
@@ -141,7 +143,7 @@ func handleMessages() {
 		for client := range clients {
 			err := client.WriteJSON(msg)
 			if err != nil {
-				log.Printf("error: &v", err)
+				log.Fatal(err)
 				client.Close()
 				delete(clients, client)
 			}
