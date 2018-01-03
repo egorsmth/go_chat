@@ -1,0 +1,30 @@
+{{define "chat_room"}}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Page Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" media="screen" href="style.css" />
+    <script src="chat_room.js"></script>
+</head>
+<body>
+    <div>
+        username is: {{.User.Username}}!
+    </div>
+    <div>
+        {{range .Messages}}
+            <div>
+                <p>{{.User.Username}}</p>
+                <p>{{.Message}}</p>
+                <p>{{.Created}}</p>
+            </div>
+        {{end}}
+    </div>
+    <form>
+        <input type="text">
+        <button>Send</button>
+    </form>
+</body>
+</html>
+{{end}}

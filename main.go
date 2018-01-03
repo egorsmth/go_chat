@@ -2,26 +2,13 @@ package main
 
 import (
 	"fmt"
-	"html/template"
 	"log"
 	"net/http"
 	"sort"
 
-	"github.com/gorilla/websocket"
-
-	"./models"
+	"./controllers"
 	"./shared"
 )
-
-var clients = make(map[*websocket.Conn]bool)
-var broadcast = make(chan Message)
-
-var upgrader = websocket.Upgrader{}
-
-type Message struct {
-	Username string `json:"username"`
-	Message  string `json:"message"`
-}
 
 func printHeaders(w http.ResponseWriter, r *http.Request) {
 	// adding debug header to test (strong/weak) ETags in combination with NGINX
@@ -54,44 +41,10 @@ func printHeaders(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-type chatResponse struct {
-	User      *models.User
-	ChatRooms *[]models.UserToChatRoom
-}
-
-func chat(w http.ResponseWriter, r *http.Request) {
-	sid, err := r.Cookie("sessionid")
-	if err != nil {
-		log.Println(err)
-		// redirect tp login if no session
-	}
-	user, err := models.GetUserFromSession(sid.Value)
-	if err != nil {
-		log.Println("In main GetUserFromSession error:", err)
-		// redirect tp login if no session
-	}
-
-	t := template.New("chat")                           // Create a template.
-	t = template.Must(t.ParseFiles("public/chat.html")) // Parse template file.
-	if err != nil {
-		log.Println("parse file err:", err)
-	}
-	cr := chatResponse{}
-	cr.User = user
-	cr.ChatRooms, err = models.GetChatRooms(user)
-	err = t.Execute(w, cr)
-	if err != nil {
-		log.Println("template Execute err:", err)
-	}
-
-	//printHeaders(w, r)
-
-}
-
 func main() {
 	shared.Init("user=root password=root dbname=social_net sslmode=disable")
-	http.Handle("/chat", http.HandlerFunc(chat))
-	//http.Handle("/chat-room", http.HandlerFunc(chatRoom))
+	http.Handle("/chat", http.HandlerFunc(controllers.Chat))
+	http.Handle("/chat_room", http.HandlerFunc(controllers.ChatRoom))
 	fs := http.FileServer(http.Dir("public"))
 	http.Handle("/", fs)
 
@@ -130,19 +83,5 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 		broadcast <- msg
-	}
-}
-
-func handleMessages() {
-	for {
-		msg := <-broadcast
-		for client := range clients {
-			err := client.WriteJSON(msg)
-			if err != nil {
-				log.Fatal(err)
-				client.Close()
-				delete(clients, client)
-			}
-		}
 	}
 }

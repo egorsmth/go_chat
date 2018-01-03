@@ -10,15 +10,15 @@ import (
 )
 
 type session struct {
-	session_key  *string
-	session_data *string
-	expire_data  *time.Time
+	session_key  string
+	session_data string
+	expire_data  time.Time
 }
 
 type userSess struct {
-	Auth_user_hash    *string `json:"_auth_user_hash"`
-	Auth_user_id      *string `json:"_auth_user_id"`
-	Auth_user_backend *string `json:"_auth_user_backend"`
+	Auth_user_hash    string `json:"_auth_user_hash"`
+	Auth_user_id      string `json:"_auth_user_id"`
+	Auth_user_backend string `json:"_auth_user_backend"`
 }
 
 // User is auth_user table model
@@ -31,7 +31,7 @@ type User struct {
 func GetUserByID(id string) (*User, error) {
 	row := shared.Db.QueryRow("select id, username from auth_user where id=$1", id)
 	user := User{}
-	err := row.Scan(user.ID, user.Username)
+	err := row.Scan(&user.ID, &user.Username)
 	if err != nil {
 		return nil, err
 	}
@@ -49,12 +49,12 @@ func GetUserFromSession(skey string) (*User, error) {
 	}
 
 	user := userSess{}
-	err = genUser(&user, *sess.session_data)
+	err = genUser(&user, sess.session_data)
 	if err != nil {
 		return nil, err
 	}
 
-	userDb, err := GetUserByID(*user.Auth_user_id)
+	userDb, err := GetUserByID(user.Auth_user_id)
 	if err != nil {
 		return nil, err
 	}

@@ -8,16 +8,14 @@
             username is: {{.User.Username}}!
         </div>
         <div>
-            asdasdasd
             {{range .ChatRooms}}
-                <a href="/chat_room?id={{.roomId}}">    
+                <a href="/chat_room?id={{.ID}}">    
                     <div>
-                        <p>{{.UserId}}</p>
-                        <p>{{.ChatRoomId}}</p>
+                        <p>{{.ID}}</p>
+                        <p>{{.Type}}</p>
                     </div>
                 </a>
             {{end}}
-            zxczxcxzc
         </div>
     </body>
 </html>
