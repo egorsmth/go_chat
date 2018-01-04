@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"../shared"
+	"github.com/egorsmth/go_chat/shared"
 )
 
 type session struct {

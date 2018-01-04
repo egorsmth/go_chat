@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"sort"
 
-	"./controllers"
-	"./shared"
+	"github.com/egorsmth/go_chat/controllers"
+	"github.com/egorsmth/go_chat/shared"
 )
 
 func printHeaders(w http.ResponseWriter, r *http.Request) {
@@ -24,6 +24,7 @@ func printHeaders(w http.ResponseWriter, r *http.Request) {
 	for k := range w.Header() {
 		responseKeys = append(responseKeys, k)
 	}
+
 	sort.Strings(responseKeys)
 
 	log.Println("request.RequestURI:", r.RequestURI)
@@ -56,7 +57,7 @@ func main() {
 	// 	print_headers(w, r)
 	// }))
 
-	// http.HandleFunc("/ws", handleConnections)
+	http.HandleFunc("/ws", controllers.HandleConnections)
 	// go handleMessages()
 	log.Print("http server started on :8080")
 	err := http.ListenAndServe(":8080", nil)
@@ -65,23 +66,23 @@ func main() {
 	}
 }
 
-func handleConnections(w http.ResponseWriter, r *http.Request) {
-	ws, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		log.Fatal(err)
-	}
+// func handleConnections(w http.ResponseWriter, r *http.Request) {
+// 	ws, err := upgrader.Upgrade(w, r, nil)
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
 
-	defer ws.Close()
+// 	defer ws.Close()
 
-	clients[ws] = true
-	for {
-		var msg Message
-		err := ws.ReadJSON(&msg)
-		if err != nil {
-			log.Fatal(err)
-			delete(clients, ws)
-			break
-		}
-		broadcast <- msg
-	}
-}
+// 	clients[ws] = true
+// 	for {
+// 		var msg Message
+// 		err := ws.ReadJSON(&msg)
+// 		if err != nil {
+// 			log.Fatal(err)
+// 			delete(clients, ws)
+// 			break
+// 		}
+// 		broadcast <- msg
+// 	}
+// }

@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"../models"
+	"github.com/egorsmth/go_chat/models"
 )
 
 type chatResponse struct {

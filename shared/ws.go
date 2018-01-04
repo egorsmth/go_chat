@@ -4,5 +4,5 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-var WsChatRooms = make(map[int]*[]*websocket.Conn)
+var WsChatRooms = make(map[int]map[*websocket.Conn]bool)
 var WsUpgrader = websocket.Upgrader{}

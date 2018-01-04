@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"strconv"
 
-	"../shared"
+	"github.com/egorsmth/go_chat/shared"
 )
 
 type ChatRoom struct {
