@@ -15,7 +15,7 @@ type ChatRoom struct {
 }
 
 func GetChatRooms(user *User) (*[]ChatRoom, error) {
-	rows, err := shared.Db.Query("select chat_room_id from user_profile_friends where user_id=$1", user.ID)
+	rows, err := shared.Db.Query("select chat_room_id from user_profile_usertopairchatroom where user_id=$1", user.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -31,7 +31,10 @@ func GetChatRooms(user *User) (*[]ChatRoom, error) {
 		}
 		roomsIds = append(roomsIds, ChatRoomID)
 	}
-
+	if len(roomsIds) == 0 {
+		var cr []ChatRoom
+		return &cr, nil
+	}
 	rooms := []ChatRoom{}
 
 	err = selectRooms(roomsIds, &rooms)
@@ -62,7 +65,7 @@ func selectRooms(roomsIds []int, rooms *[]ChatRoom) error {
 
 	for rows.Next() {
 		chr := ChatRoom{}
-		err = rows.Scan(&chr.ID, &chr.LastMessageID, &chr.Type, &chr.Status)
+		err = rows.Scan(&chr.ID, &chr.LastMessageID, &chr.Type)
 		if err != nil {
 			return err
 		}

@@ -16,13 +16,13 @@ type chatResponse struct {
 func Chat(w http.ResponseWriter, r *http.Request) {
 	sid, err := r.Cookie("sessionid")
 	if err != nil {
-		log.Println(err)
-		// todo redirect to login if no session
+		log.Println("sessionid not found in cookies", err)
+		http.Redirect(w, r, "/", 301)
 	}
 	user, err := models.GetUserFromSession(sid.Value)
 	if err != nil {
-		log.Println("In main GetUserFromSession error:", err)
-		// todo redirect to login if no session
+		log.Println("Cant get user from session:", err)
+		http.Redirect(w, r, "/", 301)
 	}
 
 	t := template.New("chat")                           // Create a template.
