@@ -41,7 +41,11 @@ func ChatRoom(w http.ResponseWriter, r *http.Request) {
 	t := template.New("chat_room")                           // Create a template.
 	t = template.Must(t.ParseFiles("public/chat_room.html")) // Parse template file.
 
-	cr := ChatRoomResponse{*user, nil, chatRoomID}
+	messages, err := models.GetMessagesByChatRoomID(chatRoomID)
+	if err != nil {
+		log.Println("template Execute err:", err)
+	}
+	cr := ChatRoomResponse{*user, *messages, chatRoomID}
 	err = t.Execute(w, cr)
 	if err != nil {
 		log.Println("template Execute err:", err)
@@ -107,6 +111,10 @@ func handleMessages(clients map[*websocket.Conn]bool, broadcast chan models.Mess
 	for {
 		msg := <-broadcast
 		log.Printf("user id: %v send messege %v", user.ID, msg)
+		err := msg.SaveMessage()
+		if err != nil {
+			log.Println("err while saving message", err)
+		}
 		rsp := ResponseMessage{user.Username, msg.Message, msg.Date}
 		for client := range clients {
 			err := client.WriteJSON(rsp)

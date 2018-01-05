@@ -91,6 +91,7 @@ btn.addEventListener('click', function (e) {
         var now = new Date();
         console.log(now.toISOString());
         ws.send(JSON.stringify({
+            chat_room_id: window.chat_room_id,
             user_id: window.user_id,
             message: inp,
             created: now.toISOString()
