@@ -45,7 +45,7 @@ func printHeaders(w http.ResponseWriter, r *http.Request) {
 func main() {
 	shared.Init("user=root password=root dbname=social_net sslmode=disable")
 	http.Handle("/chat", http.HandlerFunc(controllers.Chat))
-	http.Handle("/chat_room", http.HandlerFunc(controllers.ChatRoom))
+	http.Handle("/chat_rooms", http.HandlerFunc(controllers.ChatRooms))
 	fs := http.FileServer(http.Dir("public"))
 	http.Handle("/", fs)
 

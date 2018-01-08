@@ -30,19 +30,9 @@ func Chat(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println("parse file err:", err)
 	}
-	cr := chatResponse{}
-	cr.User = *user
-	chatRooms, err := models.GetChatRooms(user)
-	if err != nil {
-		log.Println("GetChatRooms err:", err)
-	}
-	cr.ChatRooms = *chatRooms
 
 	err = t.Execute(w, cr)
 	if err != nil {
 		log.Println("template Execute err:", err)
 	}
-
-	//printHeaders(w, r)
-
 }

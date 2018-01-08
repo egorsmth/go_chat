@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"html/template"
+	"encoding/json"
 	"log"
 	"net/http"
 	"strconv"
@@ -19,14 +19,7 @@ type ChatRoomResponse struct {
 	RoomID   int
 }
 
-func ChatRoom(w http.ResponseWriter, r *http.Request) {
-	params := r.URL.Query()
-	ID := params.Get("id")
-	chatRoomID, err := strconv.Atoi(ID)
-	if err != nil {
-		log.Fatal("Unable to get id frow chat room url:", err)
-	}
-
+func ChatRooms(w http.ResponseWriter, r *http.Request) {
 	sid, err := r.Cookie("sessionid")
 	if err != nil {
 		log.Println(err)
@@ -38,18 +31,8 @@ func ChatRoom(w http.ResponseWriter, r *http.Request) {
 		// todo redirect to login if no session
 	}
 
-	t := template.New("chat_room")                           // Create a template.
-	t = template.Must(t.ParseFiles("public/chat_room.html")) // Parse template file.
-
-	messages, err := models.GetMessagesByChatRoomID(chatRoomID)
-	if err != nil {
-		log.Println("template Execute err:", err)
-	}
-	cr := ChatRoomResponse{*user, *messages, chatRoomID}
-	err = t.Execute(w, cr)
-	if err != nil {
-		log.Println("template Execute err:", err)
-	}
+	rooms, err := models.GetChatRooms(user.ID)
+	json.NewEncoder(w).Encode(rooms)
 }
 
 func HandleConnections(w http.ResponseWriter, r *http.Request) {
