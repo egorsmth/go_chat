@@ -31,7 +31,7 @@ func ChatRooms(w http.ResponseWriter, r *http.Request) {
 		// todo redirect to login if no session
 	}
 
-	rooms, err := models.GetChatRooms(user.ID)
+	rooms, err := models.GetChatRooms(user)
 	json.NewEncoder(w).Encode(rooms)
 }
 

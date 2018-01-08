@@ -19,7 +19,7 @@ func Chat(w http.ResponseWriter, r *http.Request) {
 		log.Println("sessionid not found in cookies", err)
 		http.Redirect(w, r, "/", 301)
 	}
-	user, err := models.GetUserFromSession(sid.Value)
+	_, err = models.GetUserFromSession(sid.Value)
 	if err != nil {
 		log.Println("Cant get user from session:", err)
 		http.Redirect(w, r, "/", 301)
@@ -31,7 +31,7 @@ func Chat(w http.ResponseWriter, r *http.Request) {
 		log.Println("parse file err:", err)
 	}
 
-	err = t.Execute(w, cr)
+	err = t.Execute(w, nil)
 	if err != nil {
 		log.Println("template Execute err:", err)
 	}

@@ -30,8 +30,12 @@
 //     }
 // });
 import ReactDOM from 'react-dom';
+import React from 'react';
+import 'bootstrap';
+import './style.scss'
+import App from './src/app'
 
 ReactDOM.render(
     <App />,
-    document.getElementById('container')
+    document.getElementById('app-container')
 );
