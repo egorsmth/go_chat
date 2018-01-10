@@ -8,10 +8,10 @@ import (
 )
 
 type Message struct {
-	User       User
-	AuthorID   int       `json:"user_id,string"`
+	User       User      `json:"author"`
+	AuthorID   int       `json:"author_id,string"`
 	ChatRoomID int       `json:"chat_room_id,string"`
-	Message    string    `json:"message"`
+	Message    string    `json:"message,string"`
 	Date       time.Time `json:"created,time"`
 }
 
@@ -26,7 +26,8 @@ func (msg Message) SaveMessage() error {
 }
 
 func GetMessagesByChatRoomID(ID int) (*[]Message, error) {
-	rows, err := shared.Db.Query("select username, user_id, chat_room_id, message, created_at from user_profile_message join auth_user on auth_user.id=user_id where chat_room_id=$1", ID)
+	rows, err := shared.Db.Query(
+		"select username, user_id, chat_room_id, message, created_at, avatar from user_profile_message join auth_user on auth_user.id=user_id join user_profile_profile on user_profile_profile.user_id=user_id where chat_room_id=$1", ID)
 	if err != nil {
 		log.Println("error while get messages for chat ", ID)
 		return nil, err
@@ -35,7 +36,7 @@ func GetMessagesByChatRoomID(ID int) (*[]Message, error) {
 	for rows.Next() {
 		usr := User{}
 		msg := Message{}
-		err := rows.Scan(&usr.Username, &msg.AuthorID, &msg.ChatRoomID, &msg.Message, &msg.Date)
+		err := rows.Scan(&usr.Username, &msg.AuthorID, &msg.ChatRoomID, &msg.Message, &msg.Date, &usr.Avatar)
 		msg.User = usr
 		if err != nil {
 			log.Println("error while scan message for chat ", ID)

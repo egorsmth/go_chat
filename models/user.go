@@ -23,8 +23,9 @@ type userSess struct {
 
 // User is auth_user table model
 type User struct {
-	ID       int
-	Username string
+	ID       int    `json:"id,string"`
+	Username string `json:"username,string"`
+	Avatar   string `json:"avatar,string"`
 }
 
 // GetUserByID get user by id

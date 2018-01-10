@@ -8,8 +8,8 @@ export default class ChatRooms extends React.Component {
     }
 
     renderChatRooms () {
-        if (this.state.chatRooms.length > 0) {
-            return this.state.chatRooms.map(chatRoom => {
+        if (this.props.chatRooms.length > 0) {
+            return this.props.chatRooms.map(chatRoom => {
                 <ChatRoomsBlock key={chatRoom.id} chatRoomData={chatRoom} onClick={this.clickChatRoom}/>
             })
         }

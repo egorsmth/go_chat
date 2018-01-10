@@ -5,8 +5,8 @@ import SendMessageForm from './send-message-form'
 
 export default class ChatRoom extends React.Component {
     renderMessages() {
-        if (this.state.messages.length > 0) {
-            return this.state.messages.map(message => {
+        if (this.props.messages.length > 0) {
+            return this.props.messages.map(message => {
                 return <Message key={message.id} messageData={message} />
             })
         }

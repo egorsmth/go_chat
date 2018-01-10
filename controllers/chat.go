@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"encoding/json"
 	"html/template"
 	"log"
 	"net/http"
@@ -9,8 +10,8 @@ import (
 )
 
 type chatResponse struct {
-	User      models.User
-	ChatRooms []models.ChatRoom
+	User    models.User
+	AppData string
 }
 
 func Chat(w http.ResponseWriter, r *http.Request) {
@@ -19,7 +20,7 @@ func Chat(w http.ResponseWriter, r *http.Request) {
 		log.Println("sessionid not found in cookies", err)
 		http.Redirect(w, r, "/", 301)
 	}
-	_, err = models.GetUserFromSession(sid.Value)
+	user, err := models.GetUserFromSession(sid.Value)
 	if err != nil {
 		log.Println("Cant get user from session:", err)
 		http.Redirect(w, r, "/", 301)
@@ -31,7 +32,17 @@ func Chat(w http.ResponseWriter, r *http.Request) {
 		log.Println("parse file err:", err)
 	}
 
-	err = t.Execute(w, nil)
+	cr := chatResponse{}
+	chatRooms, err := models.GetChatRooms(user)
+	if err != nil {
+		log.Println("err while getting initial chat rooms:", err)
+	}
+	jsonCr, err := json.Marshal(chatRooms)
+	if err != nil {
+		log.Println("err while marshal initial app data:", err)
+	}
+	cr.AppData = string(jsonCr)
+	err = t.Execute(w, cr)
 	if err != nil {
 		log.Println("template Execute err:", err)
 	}

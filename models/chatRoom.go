@@ -8,10 +8,10 @@ import (
 )
 
 type ChatRoom struct {
-	ID            int
-	LastMessageID int
-	Type          string
-	Status        string
+	ID            int     `json:"id,string"`
+	LastMessage   Message `json:"last_message,omitempty"`
+	LastMessageID int     `json:"last_message_id,omitempty"`
+	Status        string  `json:"status,string"`
 }
 
 func GetChatRooms(user *User) (*[]ChatRoom, error) {
@@ -65,7 +65,7 @@ func selectRooms(roomsIds []int, rooms *[]ChatRoom) error {
 
 	for rows.Next() {
 		chr := ChatRoom{}
-		err = rows.Scan(&chr.ID, &chr.LastMessageID, &chr.Type)
+		err = rows.Scan(&chr.ID, &chr.LastMessageID, &chr.Status)
 		if err != nil {
 			return err
 		}

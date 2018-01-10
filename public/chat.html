@@ -4,21 +4,12 @@
         <link rel="stylesheet" href="js/style.css"> 
     </head>
     <body>
-        <!-- <div>
-            username is: {{.User.Username}}!
-        </div>
-        <div>
-            {{range .ChatRooms}}
-                <a href="/chat_room?id={{.ID}}">    
-                    <div>
-                        <p>{{.ID}}</p>
-                        <p>{{.Type}}</p>
-                    </div>
-                </a>
-            {{end}}
-        </div> -->
         <div class="container" id="app">
         </div>
+        <script>
+            window.appData = JSON.parse('{{.AppData}}')
+            console.log(window.appData)
+        </script>
         <script src="js/app.js"></script>
     </body>
 </html>
