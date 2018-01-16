@@ -4,12 +4,12 @@ import cn from 'classnames';
 
 export default class ChatRoomBlock extends React.Component {
     onClick = () => {
-        this.props.onClick(this.props.key)
+        this.props.onClick(this.props.chatRoomData.id)
     }
 
     render() {
-        const mesasge = this.props.chatRoomData.message
-        const user = this.props.ChatRoom.user
+        console.log(this.props)
+        const mesasge = this.props.chatRoomData.lastMessage
         const messageClassName = cn({
             'col-8': true,
             'msg-unread': mesasge.status == 'unread'
@@ -17,9 +17,10 @@ export default class ChatRoomBlock extends React.Component {
         return <div className='row' onClick={this.onClick}>
             <div className='col-12'>
                 <div className='col-4'>
-                    <img src={user.avatar}/>
+                    {/* <img src={user.avatar}/> */}
+                    {mesasge.created}
                 </div>
-                <div className={messageClassName}>{mesasge.text}</div>
+                <div className={messageClassName}>{mesasge.message}</div>
             </div>
         </div>
     }

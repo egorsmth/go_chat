@@ -44,8 +44,8 @@ func printHeaders(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	shared.Init("user=root password=root dbname=social_net sslmode=disable")
-	http.Handle("/chat", http.HandlerFunc(controllers.Chat))
-	http.Handle("/chat_rooms", http.HandlerFunc(controllers.ChatRooms))
+	http.HandleFunc("/chat", controllers.Chat)
+	//http.Handle("/chat_rooms", http.HandlerFunc(controllers.ChatRooms))
 	fs := http.FileServer(http.Dir("public"))
 	http.Handle("/", fs)
 
@@ -57,7 +57,7 @@ func main() {
 	// 	print_headers(w, r)
 	// }))
 
-	http.HandleFunc("/ws", controllers.HandleConnections)
+	http.HandleFunc("/chat/ws", controllers.HandleConnections)
 	// go handleMessages()
 	log.Print("http server started on :8080")
 	err := http.ListenAndServe(":8080", nil)

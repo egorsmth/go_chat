@@ -9,15 +9,15 @@ import (
 
 type ChatRoom struct {
 	ID            int     `json:"id,string"`
-	LastMessage   Message `json:"last_message,omitempty"`
-	LastMessageID int     `json:"last_message_id,omitempty"`
+	LastMessage   Message `json:"lastMessage,omitempty"`
+	LastMessageID int     `json:"lastMessageId,omitempty"`
 	Status        string  `json:"status,string"`
 }
 
-func GetChatRooms(user *User) (*[]ChatRoom, error) {
+func GetChatRooms(user *User) (*[]ChatRoom, *[]int, error) {
 	rows, err := shared.Db.Query("select chat_room_id from user_profile_usertopairchatroom where user_id=$1", user.ID)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	defer rows.Close()
 
@@ -27,26 +27,27 @@ func GetChatRooms(user *User) (*[]ChatRoom, error) {
 		err := rows.Scan(&ChatRoomID)
 		// log.Print("chat room id", ChatRoomID)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		roomsIds = append(roomsIds, ChatRoomID)
 	}
 	if len(roomsIds) == 0 {
 		var cr []ChatRoom
-		return &cr, nil
+		var chatRoomsIds []int
+		return &cr, &chatRoomsIds, nil
 	}
 	rooms := []ChatRoom{}
 
 	err = selectRooms(roomsIds, &rooms)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	err = rows.Err()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return &rooms, nil
+	return &rooms, &roomsIds, nil
 }
 
 func selectRooms(roomsIds []int, rooms *[]ChatRoom) error {

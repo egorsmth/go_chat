@@ -4,13 +4,15 @@ import React from 'react';
 export default class Message extends React.Component {
     render() {
         const message = this.props.messageData
+        console.log(message)
         return <div className='row'>
             <div className='col-12'>
                 <div className='col-4'>
-                    {this.props.messageData.user.avatar}
+                    {message.author.avatar}
+                    {message.author.username}
                 </div>
                 <div className='col-8'>
-                    {this.props.messageData.text}
+                    {message.text}
                 </div>
             </div>
         </div>

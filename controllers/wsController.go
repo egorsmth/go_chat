@@ -1,39 +1,15 @@
 package controllers
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 	"strconv"
 	"time"
 
-	"github.com/gorilla/websocket"
-
 	"github.com/egorsmth/go_chat/models"
 	"github.com/egorsmth/go_chat/shared"
+	"github.com/gorilla/websocket"
 )
-
-type ChatRoomResponse struct {
-	User     models.User
-	Messages []models.Message
-	RoomID   int
-}
-
-func ChatRooms(w http.ResponseWriter, r *http.Request) {
-	sid, err := r.Cookie("sessionid")
-	if err != nil {
-		log.Println(err)
-		// todo redirect to login if no session
-	}
-	user, err := models.GetUserFromSession(sid.Value)
-	if err != nil {
-		log.Println("In ChatRoom GetUserFromSession error:", err)
-		// todo redirect to login if no session
-	}
-
-	rooms, err := models.GetChatRooms(user)
-	json.NewEncoder(w).Encode(rooms)
-}
 
 func HandleConnections(w http.ResponseWriter, r *http.Request) {
 	params := r.URL.Query()

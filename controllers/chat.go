@@ -9,8 +9,13 @@ import (
 	"github.com/egorsmth/go_chat/models"
 )
 
+type appData struct {
+	ChatRooms *[]models.ChatRoom            `json:"chatRooms,omitonempty"`
+	Messages  *map[string]*[]models.Message `json:"messages"`
+}
+
 type chatResponse struct {
-	User    models.User
+	User    string
 	AppData string
 }
 
@@ -33,15 +38,32 @@ func Chat(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cr := chatResponse{}
-	chatRooms, err := models.GetChatRooms(user)
+	appData := appData{}
+
+	chatRooms, chatRoomsids, err := models.GetChatRooms(user)
 	if err != nil {
 		log.Println("err while getting initial chat rooms:", err)
 	}
-	jsonCr, err := json.Marshal(chatRooms)
+	appData.ChatRooms = chatRooms
+
+	messages, err := models.GetMessages(*chatRoomsids)
+	if err != nil {
+		log.Println("err while getting initial messages:", err)
+	}
+	appData.Messages = messages
+
+	jsonAppData, err := json.Marshal(appData)
 	if err != nil {
 		log.Println("err while marshal initial app data:", err)
 	}
-	cr.AppData = string(jsonCr)
+	cr.AppData = string(jsonAppData)
+
+	jsonUser, err := json.Marshal(user)
+	if err != nil {
+		log.Println("err while marshal user:", err)
+	}
+	cr.User = string(jsonUser)
+
 	err = t.Execute(w, cr)
 	if err != nil {
 		log.Println("template Execute err:", err)

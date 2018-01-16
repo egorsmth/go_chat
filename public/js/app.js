@@ -669,7 +669,7 @@ var VIEW_CHAT_ROOMS = exports.VIEW_CHAT_ROOMS = 'chat-rooms'; // const ws = new 
 // });
 var VIEW_CHAT_ROOM = exports.VIEW_CHAT_ROOM = 'chat-room';
 
-_reactDom2.default.render(_react2.default.createElement(_app2.default, { view: VIEW_CHAT_ROOMS, appData: window.appData }), document.getElementById('app'));
+_reactDom2.default.render(_react2.default.createElement(_app2.default, { view: VIEW_CHAT_ROOMS, appData: window.appData, user: window.user }), document.getElementById('app'));
 
 /***/ }),
 /* 9 */
@@ -34923,12 +34923,34 @@ var App = function (_React$Component) {
     function App(props) {
         _classCallCheck(this, App);
 
+        console.log(props.appData);
+
         var _this = _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).call(this, props));
+
+        _this.clickChatRoom = function (id) {
+            _this.setState({
+                chatRooms: _this.state.chatRooms,
+                messages: _this.state.messages,
+                view: _index.VIEW_CHAT_ROOM,
+                roomId: id
+            });
+        };
+
+        _this.clickMyMessages = function (e) {
+            e.preventDefault();
+            _this.setState({
+                chatRooms: _this.state.chatRooms,
+                messages: _this.state.messages,
+                view: _index.VIEW_CHAT_ROOMS,
+                roomId: -1
+            });
+        };
 
         _this.state = {
             chatRooms: props.appData.chatRooms,
             messages: props.appData.messages,
-            view: props.view
+            view: props.view,
+            roomId: -1
         };
         return _this;
     }
@@ -34936,20 +34958,48 @@ var App = function (_React$Component) {
     _createClass(App, [{
         key: 'renderChatRooms',
         value: function renderChatRooms() {
-            return _react2.default.createElement(_chatRooms2.default, { chatRooms: this.state.chatRooms });
+            return _react2.default.createElement(_chatRooms2.default, { chatRooms: this.state.chatRooms, clickChatRoom: this.clickChatRoom });
         }
     }, {
         key: 'renderChatRoom',
         value: function renderChatRoom() {
-            return _react2.default.createElement(_chatRoom2.default, { messages: this.state.messages });
+            var chatRoomMessages = this.state.messages[this.state.roomId];
+            return _react2.default.createElement(_chatRoom2.default, { messages: chatRoomMessages });
         }
     }, {
-        key: 'render',
-        value: function render() {
+        key: 'renderAppBlock',
+        value: function renderAppBlock() {
             if (this.state.view == _index.VIEW_CHAT_ROOMS) {
                 return this.renderChatRooms();
             }
             return this.renderChatRoom();
+        }
+    }, {
+        key: 'render',
+        value: function render() {
+            return _react2.default.createElement(
+                'div',
+                { className: 'col-12' },
+                _react2.default.createElement(
+                    'div',
+                    { className: 'col-3' },
+                    _react2.default.createElement(
+                        'h3',
+                        null,
+                        this.props.user.username
+                    ),
+                    _react2.default.createElement(
+                        'a',
+                        { onClick: this.clickMyMessages },
+                        'My Messages'
+                    )
+                ),
+                _react2.default.createElement(
+                    'div',
+                    { className: 'col-9' },
+                    this.renderAppBlock()
+                )
+            );
         }
     }]);
 
@@ -35017,7 +35067,7 @@ var ChatRooms = function (_React$Component) {
 
             if (this.props.chatRooms.length > 0) {
                 return this.props.chatRooms.map(function (chatRoom) {
-                    _react2.default.createElement(_chatRoomBlock2.default, { key: chatRoom.id, chatRoomData: chatRoom, onClick: _this2.clickChatRoom });
+                    return _react2.default.createElement(_chatRoomBlock2.default, { key: chatRoom.id, chatRoomData: chatRoom, onClick: _this2.clickChatRoom });
                 });
             }
             return _react2.default.createElement(
@@ -35090,15 +35140,15 @@ var ChatRoomBlock = function (_React$Component) {
         }
 
         return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = ChatRoomBlock.__proto__ || Object.getPrototypeOf(ChatRoomBlock)).call.apply(_ref, [this].concat(args))), _this), _this.onClick = function () {
-            _this.props.onClick(_this.props.key);
+            _this.props.onClick(_this.props.chatRoomData.id);
         }, _temp), _possibleConstructorReturn(_this, _ret);
     }
 
     _createClass(ChatRoomBlock, [{
         key: 'render',
         value: function render() {
-            var mesasge = this.props.chatRoomData.message;
-            var user = this.props.ChatRoom.user;
+            console.log(this.props);
+            var mesasge = this.props.chatRoomData.lastMessage;
             var messageClassName = (0, _classnames2.default)({
                 'col-8': true,
                 'msg-unread': mesasge.status == 'unread'
@@ -35112,12 +35162,12 @@ var ChatRoomBlock = function (_React$Component) {
                     _react2.default.createElement(
                         'div',
                         { className: 'col-4' },
-                        _react2.default.createElement('img', { src: user.avatar })
+                        mesasge.created
                     ),
                     _react2.default.createElement(
                         'div',
                         { className: messageClassName },
-                        mesasge.text
+                        mesasge.message
                     )
                 )
             );
@@ -35303,6 +35353,7 @@ var Message = function (_React$Component) {
         key: 'render',
         value: function render() {
             var message = this.props.messageData;
+            console.log(message);
             return _react2.default.createElement(
                 'div',
                 { className: 'row' },
@@ -35312,12 +35363,13 @@ var Message = function (_React$Component) {
                     _react2.default.createElement(
                         'div',
                         { className: 'col-4' },
-                        this.props.messageData.user.avatar
+                        message.author.avatar,
+                        message.author.username
                     ),
                     _react2.default.createElement(
                         'div',
                         { className: 'col-8' },
-                        this.props.messageData.text
+                        message.text
                     )
                 )
             );
