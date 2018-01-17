@@ -8,10 +8,10 @@ import (
 )
 
 type ChatRoom struct {
-	ID            int     `json:"id,string"`
-	LastMessage   Message `json:"lastMessage,omitempty"`
-	LastMessageID int     `json:"lastMessageId,omitempty"`
-	Status        string  `json:"status,string"`
+	ID            int      `json:"id,string"`
+	LastMessage   *Message `json:"lastMessage,omitempty"`
+	LastMessageID int      `json:"lastMessageId,omitempty"`
+	Status        string   `json:"status,string"`
 }
 
 func GetChatRooms(user *User) (*[]ChatRoom, *[]int, error) {
@@ -36,9 +36,8 @@ func GetChatRooms(user *User) (*[]ChatRoom, *[]int, error) {
 		var chatRoomsIds []int
 		return &cr, &chatRoomsIds, nil
 	}
-	rooms := []ChatRoom{}
 
-	err = selectRooms(roomsIds, &rooms)
+	rooms, err := selectRooms(roomsIds)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -47,11 +46,12 @@ func GetChatRooms(user *User) (*[]ChatRoom, *[]int, error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	return &rooms, &roomsIds, nil
+	return rooms, &roomsIds, nil
 }
 
-func selectRooms(roomsIds []int, rooms *[]ChatRoom) error {
-	buf := bytes.NewBufferString("select * from user_profile_chatroom where id in (")
+func selectRooms(roomsIds []int) (*[]ChatRoom, error) {
+	buf := bytes.NewBufferString("select id, last_message_id, type from user_profile_chatroom " +
+		"where id in (")
 	for i, v := range roomsIds {
 		if i > 0 {
 			buf.WriteString(",")
@@ -61,21 +61,22 @@ func selectRooms(roomsIds []int, rooms *[]ChatRoom) error {
 	buf.WriteString(")")
 	rows, err := shared.Db.Query(buf.String())
 	if err != nil {
-		return err
+		return nil, err
 	}
 
+	rooms := []ChatRoom{}
 	for rows.Next() {
 		chr := ChatRoom{}
 		err = rows.Scan(&chr.ID, &chr.LastMessageID, &chr.Status)
 		if err != nil {
-			return err
+			return nil, err
 		}
-		*rooms = append(*rooms, chr)
+		rooms = append(rooms, chr)
 	}
 
 	err = rows.Err()
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return &rooms, nil
 }

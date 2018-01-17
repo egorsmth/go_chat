@@ -39,7 +39,7 @@ export default class App extends React.Component {
     }
 
     renderChatRoom() {
-        const chatRoomMessages = this.state.messages[this.state.roomId]
+        const chatRoomMessages = this.state.messages[this.state.roomId] || []
         return <ChatRoom messages={chatRoomMessages} />
     }
 

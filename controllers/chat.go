@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/egorsmth/go_chat/models"
 )
@@ -44,12 +45,14 @@ func Chat(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println("err while getting initial chat rooms:", err)
 	}
-	appData.ChatRooms = chatRooms
 
 	messages, err := models.GetMessages(*chatRoomsids)
 	if err != nil {
 		log.Println("err while getting initial messages:", err)
 	}
+
+	chatRooms = linkChatRoomsWithLastMessage(*chatRooms, *messages)
+	appData.ChatRooms = chatRooms
 	appData.Messages = messages
 
 	jsonAppData, err := json.Marshal(appData)
@@ -68,4 +71,18 @@ func Chat(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println("template Execute err:", err)
 	}
+}
+
+func linkChatRoomsWithLastMessage(chatRooms []models.ChatRoom, messages map[string]*[]models.Message) *[]models.ChatRoom {
+	newChatRooms := []models.ChatRoom{}
+	for _, chatRoom := range chatRooms {
+		chatRoomID := strconv.Itoa(chatRoom.ID)
+		chatRoomMessages := messages[chatRoomID]
+		if chatRoomMessages != nil {
+			msg := (*chatRoomMessages)[len(*chatRoomMessages)-1]
+			chatRoom.LastMessage = &msg
+		}
+		newChatRooms = append(newChatRooms, chatRoom)
+	}
+	return &newChatRooms
 }

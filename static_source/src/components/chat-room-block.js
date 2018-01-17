@@ -7,20 +7,31 @@ export default class ChatRoomBlock extends React.Component {
         this.props.onClick(this.props.chatRoomData.id)
     }
 
-    render() {
-        console.log(this.props)
-        const mesasge = this.props.chatRoomData.lastMessage
+    renderMessageBody() {
+        const message = this.props.chatRoomData.lastMessage
+        if (!message) {
+            return <div className='col-12'>
+                No messages yet!
+            </div>
+        }
         const messageClassName = cn({
             'col-8': true,
-            'msg-unread': mesasge.status == 'unread'
+            'msg-unread': message.status == 'unread'
         })
+
+        return <div className='col-12'>
+            <div className='col-4'>
+                <img src={message.author.avatar}/>
+                {message.author.username} {message.created}
+            </div>
+            <div className={messageClassName}>{message.text}</div>
+        </div>
+    }
+
+    render() {
         return <div className='row' onClick={this.onClick}>
             <div className='col-12'>
-                <div className='col-4'>
-                    {/* <img src={user.avatar}/> */}
-                    {mesasge.created}
-                </div>
-                <div className={messageClassName}>{mesasge.message}</div>
+                {this.renderMessageBody()}
             </div>
         </div>
     }

@@ -34963,7 +34963,7 @@ var App = function (_React$Component) {
     }, {
         key: 'renderChatRoom',
         value: function renderChatRoom() {
-            var chatRoomMessages = this.state.messages[this.state.roomId];
+            var chatRoomMessages = this.state.messages[this.state.roomId] || [];
             return _react2.default.createElement(_chatRoom2.default, { messages: chatRoomMessages });
         }
     }, {
@@ -35145,30 +35145,49 @@ var ChatRoomBlock = function (_React$Component) {
     }
 
     _createClass(ChatRoomBlock, [{
-        key: 'render',
-        value: function render() {
-            console.log(this.props);
-            var mesasge = this.props.chatRoomData.lastMessage;
+        key: 'renderMessageBody',
+        value: function renderMessageBody() {
+            var message = this.props.chatRoomData.lastMessage;
+            if (!message) {
+                return _react2.default.createElement(
+                    'div',
+                    { className: 'col-12' },
+                    'No messages yet!'
+                );
+            }
             var messageClassName = (0, _classnames2.default)({
                 'col-8': true,
-                'msg-unread': mesasge.status == 'unread'
+                'msg-unread': message.status == 'unread'
             });
+
+            return _react2.default.createElement(
+                'div',
+                { className: 'col-12' },
+                _react2.default.createElement(
+                    'div',
+                    { className: 'col-4' },
+                    _react2.default.createElement('img', { src: message.author.avatar }),
+                    message.author.username,
+                    ' ',
+                    message.created
+                ),
+                _react2.default.createElement(
+                    'div',
+                    { className: messageClassName },
+                    message.text
+                )
+            );
+        }
+    }, {
+        key: 'render',
+        value: function render() {
             return _react2.default.createElement(
                 'div',
                 { className: 'row', onClick: this.onClick },
                 _react2.default.createElement(
                     'div',
                     { className: 'col-12' },
-                    _react2.default.createElement(
-                        'div',
-                        { className: 'col-4' },
-                        mesasge.created
-                    ),
-                    _react2.default.createElement(
-                        'div',
-                        { className: messageClassName },
-                        mesasge.message
-                    )
+                    this.renderMessageBody()
                 )
             );
         }

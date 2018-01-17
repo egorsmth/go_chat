@@ -32,7 +32,8 @@ func GetMessagesByChatRoomID(ID int) (*[]Message, error) {
 	rows, err := shared.Db.Query("select username, user_id, chat_room_id, message, created_at, avatar from user_profile_message "+
 		"join auth_user on auth_user.id=user_id "+
 		"left join user_profile_profile on user_profile_profile.user_id=user_id "+
-		"where chat_room_id=$1", ID)
+		"where chat_room_id=$1 "+
+		"order by created_at", ID)
 	if err != nil {
 		log.Println("error while get messages for chat ", ID)
 		return nil, err
