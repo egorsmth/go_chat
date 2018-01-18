@@ -5,14 +5,12 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-	"strconv"
 
 	"github.com/egorsmth/go_chat/models"
 )
 
 type appData struct {
-	ChatRooms *[]models.ChatRoom            `json:"chatRooms,omitonempty"`
-	Messages  *map[string]*[]models.Message `json:"messages"`
+	ChatRooms *[]models.ChatRoom `json:"chatRooms,omitonempty"`
 }
 
 type chatResponse struct {
@@ -41,19 +39,11 @@ func Chat(w http.ResponseWriter, r *http.Request) {
 	cr := chatResponse{}
 	appData := appData{}
 
-	chatRooms, chatRoomsids, err := models.GetChatRooms(user)
+	chatRooms, _, err := models.GetChatRooms(user)
 	if err != nil {
 		log.Println("err while getting initial chat rooms:", err)
 	}
-
-	messages, err := models.GetMessages(*chatRoomsids)
-	if err != nil {
-		log.Println("err while getting initial messages:", err)
-	}
-
-	chatRooms = linkChatRoomsWithLastMessage(*chatRooms, *messages)
 	appData.ChatRooms = chatRooms
-	appData.Messages = messages
 
 	jsonAppData, err := json.Marshal(appData)
 	if err != nil {
@@ -71,18 +61,4 @@ func Chat(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println("template Execute err:", err)
 	}
-}
-
-func linkChatRoomsWithLastMessage(chatRooms []models.ChatRoom, messages map[string]*[]models.Message) *[]models.ChatRoom {
-	newChatRooms := []models.ChatRoom{}
-	for _, chatRoom := range chatRooms {
-		chatRoomID := strconv.Itoa(chatRoom.ID)
-		chatRoomMessages := messages[chatRoomID]
-		if chatRoomMessages != nil {
-			msg := (*chatRoomMessages)[len(*chatRoomMessages)-1]
-			chatRoom.LastMessage = &msg
-		}
-		newChatRooms = append(newChatRooms, chatRoom)
-	}
-	return &newChatRooms
 }

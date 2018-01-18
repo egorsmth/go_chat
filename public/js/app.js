@@ -34948,7 +34948,7 @@ var App = function (_React$Component) {
 
         _this.state = {
             chatRooms: props.appData.chatRooms,
-            messages: props.appData.messages,
+            messages: {},
             view: props.view,
             roomId: -1
         };

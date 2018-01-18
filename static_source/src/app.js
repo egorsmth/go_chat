@@ -9,7 +9,7 @@ export default class App extends React.Component {
         super(props);
         this.state = {
             chatRooms: props.appData.chatRooms,
-            messages: props.appData.messages,
+            messages: {},
             view: props.view,
             roomId: -1
         }

@@ -1,7 +1,7 @@
 {{define "chat"}}
 <html>
     <head>
-        <link rel="stylesheet" href="js/style.css"> 
+        <link rel="stylesheet" href="/js/style.css"> 
     </head>
     <body>
         <div class="container" id="app">
@@ -10,7 +10,7 @@
             window.appData = JSON.parse('{{.AppData}}')
             window.user = JSON.parse('{{.User}}')
         </script>
-        <script src="js/app.js"></script>
+        <script src="/js/app.js"></script>
     </body>
 </html>
 {{end}}
