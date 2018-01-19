@@ -1,0 +1,4 @@
+ chat_room_id | last_message_id | type | message_id | user_id | chat_room_id | message | created_at | uid | username | avatar 
+--------------+-----------------+------+------------+---------+--------------+---------+------------+-----+----------+--------
+(0 rows)
+

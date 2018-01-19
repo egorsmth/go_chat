@@ -74,7 +74,7 @@ func handleMessages(clients map[*websocket.Conn]bool, broadcast chan models.Mess
 		if err != nil {
 			log.Println("err while saving message", err)
 		}
-		rsp := ResponseMessage{user.Username, msg.Message, msg.Date}
+		rsp := ResponseMessage{*user.Username, msg.Message, msg.Date}
 		for client := range clients {
 			err := client.WriteJSON(rsp)
 			if err != nil {

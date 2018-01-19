@@ -11,7 +11,7 @@ import (
 
 type Message struct {
 	ID         int       `json:"id"`
-	User       User      `json:"author"`
+	User       *User     `json:"author"`
 	AuthorID   int       `json:"author_id,string"`
 	ChatRoomID int       `json:"chat_room_id,string"`
 	Message    string    `json:"text"`
@@ -47,7 +47,7 @@ func GetMessagesByChatRoomID(ID int) (*[]Message, error) {
 			log.Println("error while scan message for chat ", ID)
 			return nil, err
 		}
-		msg.User = usr
+		*msg.User = usr
 		messages = append(messages, msg)
 	}
 	err = rows.Err()
@@ -84,7 +84,7 @@ func GetMessages(roomsIds []int) (*map[string]*[]Message, error) {
 			log.Println("error while scan messages for chats")
 			return nil, err
 		}
-		msg.User = usr
+		*msg.User = usr
 		intID := strconv.Itoa(msg.ChatRoomID)
 		if _, exist := messages[intID]; !exist {
 			messages[intID] = &[]Message{}
