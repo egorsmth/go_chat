@@ -10,12 +10,12 @@ import (
 )
 
 type Message struct {
-	ID         int       `json:"id"`
-	User       *User     `json:"author"`
-	AuthorID   int       `json:"author_id,string"`
-	ChatRoomID int       `json:"chat_room_id,string"`
-	Message    string    `json:"text"`
-	Date       time.Time `json:"created,time"`
+	ID         *int       `json:"id"`
+	User       *User      `json:"author"`
+	AuthorID   *int       `json:"author_id,string"`
+	ChatRoomID *int       `json:"chat_room_id,string"`
+	Message    *string    `json:"text"`
+	Date       *time.Time `json:"created,time"`
 }
 
 func (msg Message) SaveMessage() error {
@@ -85,7 +85,7 @@ func GetMessages(roomsIds []int) (*map[string]*[]Message, error) {
 			return nil, err
 		}
 		*msg.User = usr
-		intID := strconv.Itoa(msg.ChatRoomID)
+		intID := strconv.Itoa(*msg.ChatRoomID)
 		if _, exist := messages[intID]; !exist {
 			messages[intID] = &[]Message{}
 		}

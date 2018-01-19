@@ -2,11 +2,8 @@ package models
 
 import (
 	"bytes"
-	"database/sql"
-	"fmt"
 	"log"
 	"strconv"
-	"time"
 
 	"github.com/egorsmth/go_chat/shared"
 )
@@ -69,44 +66,24 @@ func selectRooms(roomsIds []int) (*[]ChatRoom, error) {
 		buf.WriteString(strconv.Itoa(v))
 	}
 	buf.WriteString(")")
-	fmt.Println(buf.String())
 	rows, err := shared.Db.Query(buf.String())
 	if err != nil {
 		log.Println("err while selecting chat rooms")
 		return nil, err
 	}
-	// type Message struct {
-	// 	ID         int       `json:"id"`
-	// 	User       User      `json:"author"`
-	// 	AuthorID   int       `json:"author_id,string"`
-	// 	ChatRoomID int       `json:"chat_room_id,string"`
-	// 	Message    string    `json:"text"`
-	// 	Date       time.Time `json:"created,time"`
-	// }
+
 	rooms := []ChatRoom{}
 	for rows.Next() {
 		chr := ChatRoom{}
 		msg := Message{}
 		usr := User{}
 
-		msgID := sql.NullInt64{}
-		msgAuthorID := sql.NullInt64{}
-		msgChatRoomID := sql.NullInt64{}
-		msgMessage := sql.NullString{}
-		msgDate := sql.NullString{}
-
-		err = rows.Scan(&chr.ID, &chr.LastMessageID, &chr.Status, &msgID, &msgAuthorID, &msgChatRoomID, &msgMessage, &msgDate, &usr.ID, &usr.Username, &usr.Avatar)
+		err = rows.Scan(&chr.ID, &chr.LastMessageID, &chr.Status, &msg.ID, &msg.AuthorID, &msg.ChatRoomID, &msg.Message, &msg.Date, &usr.ID, &usr.Username, &usr.Avatar)
 		if err != nil {
 			log.Println("err while scaning chat rooms")
 			return nil, err
 		}
-		if msgID.Valid {
-			created, err := time.Parse(time.RFC3339, msgDate.String)
-			if err != nil {
-				log.Println("couldnt parse", msgDate.String, "to time")
-				return nil, err
-			}
-			msg = Message{int(msgID.Int64), nil, int(msgAuthorID.Int64), int(msgChatRoomID.Int64), msgMessage.String, created}
+		if msg.ID != nil {
 			msg.User = &usr
 			chr.LastMessage = &msg
 		}
