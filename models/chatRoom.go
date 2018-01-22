@@ -51,14 +51,14 @@ func GetChatRooms(user *User) (*[]ChatRoom, *[]int, error) {
 }
 
 func selectRooms(roomsIds []int) (*[]ChatRoom, error) {
-	buf := bytes.NewBufferString("select user_profile_chatroom.id as chat_room_id, last_message_id, type, " + // user_profile_chatroom rows
+	buf := bytes.NewBufferString("select chatroom.id as chat_room_id, last_message_id, type, " + // user_profile_chatroom rows
 		"user_profile_message.id as message_id, user_profile_message.user_id, chat_room_id, message, created_at, " + // user_profile_message rows
 		"auth_user.id as uid, username, avatar " + // auth_user and user_profile_profile rows
-		"from user_profile_chatroom " +
+		"from user_profile_chatroom as chatroom" +
 		"left join user_profile_message on last_message_id=user_profile_message.id " +
 		"left join auth_user on user_profile_message.user_id=auth_user.id " +
 		"left join user_profile_profile on user_profile_profile.user_id=user_profile_message.user_id " +
-		"where user_profile_chatroom.id in (")
+		"where chatroom.id in (")
 	for i, v := range roomsIds {
 		if i > 0 {
 			buf.WriteString(",")

@@ -16,12 +16,29 @@ export default class App extends React.Component {
     }
 
     clickChatRoom = id => {
-        this.setState({
-            chatRooms: this.state.chatRooms,
-            messages: this.state.messages,
-            view: VIEW_CHAT_ROOM,
-            roomId: id
+        axios.get(`/chat`, {
+            params: { id }
         })
+        .then((response) => {
+            console.log(response);
+            if (response.status == 'success') {
+                const messages = this.state.messages
+                if (messages[id] == undefined) {
+                    messages[id] = response.messages
+                } else {
+                    messages[id].append(...response.messages)
+                }
+                this.setState({
+                    chatRooms: this.state.chatRooms,
+                    messages: messages,
+                    view: VIEW_CHAT_ROOM,
+                    roomId: id
+                });
+            }
+        })
+        .catch((error) => {
+            console.log(error);
+        });
     }
 
     clickMyMessages = e => {
