@@ -636,37 +636,7 @@ var _app2 = _interopRequireDefault(_app);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var VIEW_CHAT_ROOMS = exports.VIEW_CHAT_ROOMS = 'chat-rooms'; // const ws = new WebSocket(`ws://${window.location.host}/ws?id=${window.chat_room_id}`);
-
-// ws.addEventListener('message', function(e) {
-//     console.log('message comming!!!')
-//     console.log(e)
-//     var msg = JSON.parse(e.data);
-//     var mesasgeHtml = document.createElement('div');
-//     mesasgeHtml.innerHTML = `<p>${msg.username}</p><p>${msg.message}</p><p>${msg.created}</p>`;
-//     var element = document.getElementById('messages-block');
-//     element.appendChild(mesasgeHtml)
-// });
-
-// const btn = document.getElementById('btn-send')
-// btn.addEventListener('click', (e) => {
-//     console.log('clicked')
-//     const inp = document.getElementById('inp-msg').value
-//     console.log(inp)
-//     if (inp != '') {
-//         const now = new Date();
-//         console.log(now.toISOString())
-//         ws.send(
-//             JSON.stringify({
-//                 chat_room_id: window.chat_room_id,
-//                 user_id: window.user_id,
-//                 message: inp,
-//                 created: now.toISOString()
-//             })
-//         );
-//         document.getElementById('inp-msg').value = ''; // Reset newMsg
-//     }
-// });
+var VIEW_CHAT_ROOMS = exports.VIEW_CHAT_ROOMS = 'chat-rooms';
 var VIEW_CHAT_ROOM = exports.VIEW_CHAT_ROOM = 'chat-room';
 
 _reactDom2.default.render(_react2.default.createElement(_app2.default, { view: VIEW_CHAT_ROOMS, appData: window.appData, user: window.user }), document.getElementById('app'));
@@ -34909,6 +34879,8 @@ var _chatRoom2 = _interopRequireDefault(_chatRoom);
 
 var _index = __webpack_require__(8);
 
+var _wsController = __webpack_require__(39);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -34928,11 +34900,13 @@ var App = function (_React$Component) {
         var _this = _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).call(this, props));
 
         _this.clickChatRoom = function (id) {
+            var ws = (0, _wsController.getWsConnection)(id);
             _this.setState({
                 chatRooms: _this.state.chatRooms,
                 messages: _this.state.messages,
                 view: _index.VIEW_CHAT_ROOM,
-                roomId: id
+                roomId: id,
+                ws: ws
             });
         };
 
@@ -34946,9 +34920,13 @@ var App = function (_React$Component) {
             });
         };
 
+        _this.submitMessage = function (text) {
+            send(_this.state.ws, text, _this.state.roomId, window.user.id);
+        };
+
         _this.state = {
             chatRooms: props.appData.chatRooms,
-            messages: {},
+            messages: props.appData.messages,
             view: props.view,
             roomId: -1
         };
@@ -35320,7 +35298,7 @@ var ChatRoom = function (_React$Component) {
                 'div',
                 { id: 'chatRoom' },
                 this.renderMessages(),
-                _react2.default.createElement(_sendMessageForm2.default, null)
+                _react2.default.createElement(_sendMessageForm2.default, { submitMessage: this.props.submitMessage })
             );
         }
     }]);
@@ -35479,6 +35457,70 @@ var SendMessageForm = function (_React$Component) {
 }(_react2.default.Component);
 
 exports.default = SendMessageForm;
+
+/***/ }),
+/* 39 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+var getWsConnection = function getWsConnection(roomId) {
+    var ws = new WebSocket('ws://' + window.location.host + '/chat/ws?id=' + roomId); //
+
+    ws.addEventListener('message', function (e) {
+        console.log('message comming!!!');
+        console.log(e);
+        // dispatchWsResponse(e)
+    });
+
+    // const btn = document.getElementById('btn-send')
+    // btn.addEventListener('click', (e) => {
+    //     console.log('clicked')
+    //     const inp = document.getElementById('inp-msg').value
+    //     console.log(inp)
+    //     if (inp != '') {
+    //         const now = new Date();
+    //         console.log(now.toISOString())
+    //         ws.send(
+    //             JSON.stringify({
+    //                 chat_room_id: window.chat_room_id,
+    //                 user_id: window.user_id,
+    //                 message: inp,
+    //                 created: now.toISOString()
+    //             })
+    //         );
+    //         document.getElementById('inp-msg').value = ''; // Reset newMsg
+    //     }
+    // });
+
+    // dispatchWsResponse = (msgResponse) => {
+    //     var msg = JSON.parse(e.data);
+    //     var mesasgeHtml = document.createElement('div');
+    //     mesasgeHtml.innerHTML = `<p>${msg.username}</p><p>${msg.message}</p><p>${msg.created}</p>`;
+    //     var element = document.getElementById('messages-block');
+    //     element.appendChild(mesasgeHtml)
+    // }
+};
+
+var send = function send(ws, roomId, text, userId) {
+    var now = new Date();
+    var message = JSON.stringify({
+        chat_room_id: roomId,
+        user_id: userId,
+        text: text,
+        created: now.toISOString()
+    });
+    console.log('send!!!!');
+    console.log(message);
+    ws.send(message);
+};
+
+exports.getWsConnection = getWsConnection;
+exports.send = send;
 
 /***/ })
 /******/ ]);

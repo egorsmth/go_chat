@@ -18,7 +18,7 @@ export default class ChatRoom extends React.Component {
     render () {
         return <div id='chatRoom'>
             {this.renderMessages()}
-            <SendMessageForm />
+            <SendMessageForm submitMessage={this.props.submitMessage}/>
         </div>
     }
 }

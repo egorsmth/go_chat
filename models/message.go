@@ -11,7 +11,7 @@ import (
 
 type Message struct {
 	ID         *int       `json:"id"`
-	User       *User      `json:"author"`
+	User       User       `json:"author"`
 	AuthorID   *int       `json:"author_id,string"`
 	ChatRoomID *int       `json:"chat_room_id,string"`
 	Message    *string    `json:"text"`
@@ -47,7 +47,7 @@ func GetMessagesByChatRoomID(ID int) (*[]Message, error) {
 			log.Println("error while scan message for chat ", ID)
 			return nil, err
 		}
-		*msg.User = usr
+		msg.User = usr
 		messages = append(messages, msg)
 	}
 	err = rows.Err()
@@ -57,13 +57,13 @@ func GetMessagesByChatRoomID(ID int) (*[]Message, error) {
 	return &messages, nil
 }
 
-func GetMessages(roomsIds []int) (*map[string]*[]Message, error) {
+func GetMessages(roomsIds *[]int) (*map[string]*[]Message, error) {
 	buf := bytes.NewBufferString("select user_profile_message.id, username, user_profile_message.user_id, chat_room_id, message, created_at, avatar " +
 		"from user_profile_message " +
 		"join auth_user on auth_user.id=user_profile_message.user_id " +
 		"left join user_profile_profile on user_profile_profile.user_id=user_profile_message.user_id " +
 		"where chat_room_id in (")
-	for i, v := range roomsIds {
+	for i, v := range *roomsIds {
 		if i > 0 {
 			buf.WriteString(",")
 		}
@@ -84,7 +84,8 @@ func GetMessages(roomsIds []int) (*map[string]*[]Message, error) {
 			log.Println("error while scan messages for chats")
 			return nil, err
 		}
-		*msg.User = usr
+		log.Println(usr)
+		msg.User = usr
 		intID := strconv.Itoa(*msg.ChatRoomID)
 		if _, exist := messages[intID]; !exist {
 			messages[intID] = &[]Message{}

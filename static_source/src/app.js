@@ -2,6 +2,7 @@ import React from 'react';
 import ChatRooms from './components/chat-rooms'
 import ChatRoom from './components/chat-room'
 import { VIEW_CHAT_ROOMS, VIEW_CHAT_ROOM } from '../index'
+import {getWsConnection} from './wsController'
 
 export default class App extends React.Component {
     constructor(props) {
@@ -9,35 +10,20 @@ export default class App extends React.Component {
         super(props);
         this.state = {
             chatRooms: props.appData.chatRooms,
-            messages: {},
+            messages: props.appData.messages,
             view: props.view,
             roomId: -1
         }
     }
 
     clickChatRoom = id => {
-        axios.get(`/chat`, {
-            params: { id }
-        })
-        .then((response) => {
-            console.log(response);
-            if (response.status == 'success') {
-                const messages = this.state.messages
-                if (messages[id] == undefined) {
-                    messages[id] = response.messages
-                } else {
-                    messages[id].append(...response.messages)
-                }
-                this.setState({
-                    chatRooms: this.state.chatRooms,
-                    messages: messages,
-                    view: VIEW_CHAT_ROOM,
-                    roomId: id
-                });
-            }
-        })
-        .catch((error) => {
-            console.log(error);
+        const ws = getWsConnection(id);
+        this.setState({
+            chatRooms: this.state.chatRooms,
+            messages: this.state.messages,
+            view: VIEW_CHAT_ROOM,
+            roomId: id,
+            ws: ws
         });
     }
 
@@ -48,7 +34,11 @@ export default class App extends React.Component {
             messages: this.state.messages,
             view: VIEW_CHAT_ROOMS,
             roomId: -1
-        })
+        });
+    }
+
+    submitMessage = text => {
+        send(this.state.ws, text, this.state.roomId, window.user.id)
     }
 
     renderChatRooms () {

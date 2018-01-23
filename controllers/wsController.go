@@ -6,12 +6,18 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/egorsmth/go_chat/middleware"
 	"github.com/egorsmth/go_chat/models"
 	"github.com/egorsmth/go_chat/shared"
 	"github.com/gorilla/websocket"
 )
 
 func HandleConnections(w http.ResponseWriter, r *http.Request) {
+	user, err := middleware.GetUserFromSession(r)
+	if err != nil {
+		http.Redirect(w, r, "/", 301)
+	}
+
 	params := r.URL.Query()
 	ID := params.Get("id")
 	chatRoomID, err := strconv.Atoi(ID)
@@ -19,19 +25,8 @@ func HandleConnections(w http.ResponseWriter, r *http.Request) {
 		log.Fatal("Unable to get id frow ws url:", err)
 	}
 
-	sid, err := r.Cookie("sessionid")
-	if err != nil {
-		log.Println(err)
-		// todo redirect to login if no session
-	}
-	user, err := models.GetUserFromSession(sid.Value)
-	if err != nil {
-		log.Println("In ws handling GetUserFromSession error:", err)
-		// todo redirect to login if no session
-	}
-
 	ws, err := shared.WsUpgrader.Upgrade(w, r, nil)
-	log.Printf("user id: %v connected by ws to room %v", user.ID, chatRoomID)
+	log.Printf("user id: %v connected by ws to room %v", *user.ID, chatRoomID)
 	if err != nil {
 		log.Fatal(err)
 	}

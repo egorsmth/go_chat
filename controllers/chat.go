@@ -6,11 +6,13 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/egorsmth/go_chat/middleware"
 	"github.com/egorsmth/go_chat/models"
 )
 
 type appData struct {
-	ChatRooms *[]models.ChatRoom `json:"chatRooms,omitonempty"`
+	ChatRooms *[]models.ChatRoom            `json:"chatRooms,omitonempty"`
+	Messages  *map[string]*[]models.Message `json:"messages"`
 }
 
 type chatResponse struct {
@@ -19,14 +21,8 @@ type chatResponse struct {
 }
 
 func Chat(w http.ResponseWriter, r *http.Request) {
-	sid, err := r.Cookie("sessionid")
+	user, err := middleware.GetUserFromSession(r)
 	if err != nil {
-		log.Println("sessionid not found in cookies", err)
-		http.Redirect(w, r, "/", 301)
-	}
-	user, err := models.GetUserFromSession(sid.Value)
-	if err != nil {
-		log.Println("Cant get user from session:", err)
 		http.Redirect(w, r, "/", 301)
 	}
 
@@ -39,11 +35,18 @@ func Chat(w http.ResponseWriter, r *http.Request) {
 	cr := chatResponse{}
 	appData := appData{}
 
-	chatRooms, _, err := models.GetChatRooms(user)
+	chatRooms, chatRoomsID, err := models.GetChatRooms(user)
 	if err != nil {
 		log.Println("err while getting initial chat rooms:", err)
 	}
+
+	messages, err := models.GetMessages(chatRoomsID)
+	if err != nil {
+		log.Println("err while getting initial messages:", err)
+	}
+
 	appData.ChatRooms = chatRooms
+	appData.Messages = messages
 
 	jsonAppData, err := json.Marshal(appData)
 	if err != nil {
