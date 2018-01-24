@@ -18,14 +18,37 @@ type Message struct {
 	Date       *time.Time `json:"created,time"`
 }
 
-func (msg Message) SaveMessage() error {
+func (msg Message) SaveMessage() (*Message, error) {
 	log.Println("msg", msg)
-	_, err := shared.Db.Exec("insert into user_profile_message (user_id, chat_room_id, message, created_at) values ($1, $2, $3, $4)", msg.AuthorID, msg.ChatRoomID, msg.Message, msg.Date)
+	tx, err := shared.Db.Begin()
 	if err != nil {
-		log.Println("error while saving message", err)
-		return err
+		log.Println("Can't start transaction while saving message", err)
+		return nil, err
 	}
-	return nil
+	var lastMessageID int
+	err = shared.Db.QueryRow("insert into user_profile_message (user_id, chat_room_id, message, created_at) values ($1, $2, $3, $4) RETURNING id", msg.AuthorID, msg.ChatRoomID, msg.Message, msg.Date).Scan(&lastMessageID)
+	if err != nil {
+		tx.Rollback()
+		log.Println("error while saving message", err)
+		return nil, err
+	}
+
+	if err != nil {
+		tx.Rollback()
+		log.Println("error getting id of messgae while saving message", err)
+		return nil, err
+	}
+	log.Println(lastMessageID)
+	_, err = shared.Db.Exec("update user_profile_chatroom set last_message_id=$1 where id=$2", lastMessageID, msg.ChatRoomID)
+	if err != nil {
+		tx.Rollback()
+		log.Println("error updating chat room last message while saving message", err)
+		return nil, err
+	}
+	tx.Commit()
+	msg.ID = &lastMessageID
+
+	return &msg, nil
 }
 
 func GetMessagesByChatRoomID(ID int) (*[]Message, error) {
@@ -70,6 +93,7 @@ func GetMessages(roomsIds *[]int) (*map[string]*[]Message, error) {
 		buf.WriteString(strconv.Itoa(v))
 	}
 	buf.WriteString(")")
+	buf.WriteString(" order by created_at")
 	rows, err := shared.Db.Query(buf.String())
 	if err != nil {
 		return nil, err
@@ -84,7 +108,6 @@ func GetMessages(roomsIds *[]int) (*map[string]*[]Message, error) {
 			log.Println("error while scan messages for chats")
 			return nil, err
 		}
-		log.Println(usr)
 		msg.User = usr
 		intID := strconv.Itoa(*msg.ChatRoomID)
 		if _, exist := messages[intID]; !exist {

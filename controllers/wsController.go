@@ -1,10 +1,10 @@
 package controllers
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/egorsmth/go_chat/middleware"
 	"github.com/egorsmth/go_chat/models"
@@ -52,24 +52,27 @@ func HandleConnections(w http.ResponseWriter, r *http.Request) {
 		}
 		broadcast <- msg
 	}
-	log.Printf("user id: %v disconected from chat room %v", user.ID, chatRoomID)
+	log.Printf("user id: %v disconected from chat room %v", *user.ID, chatRoomID)
 }
 
 type ResponseMessage struct {
-	Username string    `json:"username"`
-	Message  string    `json:"message"`
-	Created  time.Time `json:"created"`
+	Status string `json:"status"`
+	Type   string `json:"type"`
+	Data   string `json:"data"`
 }
 
 func handleMessages(clients map[*websocket.Conn]bool, broadcast chan models.Message, user *models.User) {
 	for {
 		msg := <-broadcast
-		log.Printf("user id: %v send messege %v", user.ID, msg)
-		err := msg.SaveMessage()
+		log.Printf("user id: %v send messege %v", *user.ID, msg)
+		saved, err := msg.SaveMessage()
 		if err != nil {
 			log.Println("err while saving message", err)
+			break
 		}
-		rsp := ResponseMessage{*user.Username, *msg.Message, *msg.Date}
+		saved.User = *user
+		savedJSON, err := json.Marshal(saved)
+		rsp := ResponseMessage{"success", "MESSEGE_RECIEVED", string(savedJSON)}
 		for client := range clients {
 			err := client.WriteJSON(rsp)
 			if err != nil {

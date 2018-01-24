@@ -26,7 +26,6 @@ func GetChatRooms(user *User) (*[]ChatRoom, *[]int, error) {
 	for rows.Next() {
 		var ChatRoomID int
 		err := rows.Scan(&ChatRoomID)
-		// log.Print("chat room id", ChatRoomID)
 		if err != nil {
 			return nil, nil, err
 		}

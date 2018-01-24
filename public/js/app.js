@@ -34883,6 +34883,10 @@ var _wsController = __webpack_require__(39);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -34899,8 +34903,44 @@ var App = function (_React$Component) {
 
         var _this = _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).call(this, props));
 
+        _this.wsMessageDispatch = function (resp) {
+            switch (resp.type) {
+                case 'MESSEGE_RECIEVED':
+                    var message = JSON.parse(resp.data);
+                    var roomMessages = [].concat(_toConsumableArray(_this.state.messages[message.chat_room_id]), [message]);
+                    var newMessages = Object.assign({}, _this.state.messages, _defineProperty({}, message.chat_room_id, roomMessages));
+
+                    var chatRooms = _this.state.chatRooms.map(function (room) {
+                        if (room.id == message.chat_room_id) {
+                            return {
+                                id: room.id,
+                                lastMessage: message,
+                                lastMessageId: message.id,
+                                status: room.status
+                            };
+                        }
+                        return room;
+                    });
+                    _this.setState({
+                        chatRooms: chatRooms,
+                        messages: newMessages,
+                        view: _this.state.view,
+                        roomId: _this.state.roomId
+                    });
+                    break;
+                case 'TYPING':
+                    break;
+                case 'READ':
+                    break;
+            }
+            // var mesasgeHtml = document.createElement('div');
+            // mesasgeHtml.innerHTML = `<p>${msg.username}</p><p>${msg.message}</p><p>${msg.created}</p>`;
+            // var element = document.getElementById('messages-block');
+            // element.appendChild(mesasgeHtml)
+        };
+
         _this.clickChatRoom = function (id) {
-            var ws = (0, _wsController.getWsConnection)(id);
+            var ws = (0, _wsController.getWsConnection)(id, _this.wsMessageDispatch);
             _this.setState({
                 chatRooms: _this.state.chatRooms,
                 messages: _this.state.messages,
@@ -34921,7 +34961,7 @@ var App = function (_React$Component) {
         };
 
         _this.submitMessage = function (text) {
-            send(_this.state.ws, text, _this.state.roomId, window.user.id);
+            (0, _wsController.send)(_this.state.ws, _this.state.roomId, text, window.user.id);
         };
 
         _this.state = {
@@ -34942,7 +34982,7 @@ var App = function (_React$Component) {
         key: 'renderChatRoom',
         value: function renderChatRoom() {
             var chatRoomMessages = this.state.messages[this.state.roomId] || [];
-            return _react2.default.createElement(_chatRoom2.default, { messages: chatRoomMessages });
+            return _react2.default.createElement(_chatRoom2.default, { messages: chatRoomMessages, submitMessage: this.submitMessage });
         }
     }, {
         key: 'renderAppBlock',
@@ -35350,7 +35390,6 @@ var Message = function (_React$Component) {
         key: 'render',
         value: function render() {
             var message = this.props.messageData;
-            console.log(message);
             return _react2.default.createElement(
                 'div',
                 { className: 'row' },
@@ -35361,7 +35400,8 @@ var Message = function (_React$Component) {
                         'div',
                         { className: 'col-4' },
                         message.author.avatar,
-                        message.author.username
+                        message.author.username,
+                        message.created
                     ),
                     _react2.default.createElement(
                         'div',
@@ -35428,8 +35468,11 @@ var SendMessageForm = function (_React$Component) {
                 input: e.target.value
             });
         }, _this.onSubmit = function (e) {
-            e.preventDeafult();
+            e.preventDefault();
             _this.props.submitMessage(_this.state.input);
+            _this.setState({
+                input: ''
+            });
         }, _temp), _possibleConstructorReturn(_this, _ret);
     }
 
@@ -35441,10 +35484,10 @@ var SendMessageForm = function (_React$Component) {
                 { className: 'row' },
                 _react2.default.createElement(
                     'div',
-                    { className: 'col-12', onSubmit: this.onSubmit },
+                    { className: 'col-12' },
                     _react2.default.createElement(
                         'form',
-                        null,
+                        { onSubmit: this.onSubmit },
                         _react2.default.createElement('input', { value: this.state.input, onChange: this.onChange }),
                         _react2.default.createElement('input', { type: 'submit', value: 'Send' })
                     )
@@ -35468,13 +35511,18 @@ exports.default = SendMessageForm;
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-var getWsConnection = function getWsConnection(roomId) {
+var getWsConnection = function getWsConnection(roomId, dispatcher) {
     var ws = new WebSocket('ws://' + window.location.host + '/chat/ws?id=' + roomId); //
 
     ws.addEventListener('message', function (e) {
         console.log('message comming!!!');
-        console.log(e);
-        // dispatchWsResponse(e)
+        var resp = JSON.parse(e.data);
+        console.log(resp);
+        if (resp.status == 'success') {
+            dispatcher(resp);
+            return;
+        }
+        console.error(e);
     });
 
     // const btn = document.getElementById('btn-send')
@@ -35504,13 +35552,14 @@ var getWsConnection = function getWsConnection(roomId) {
     //     var element = document.getElementById('messages-block');
     //     element.appendChild(mesasgeHtml)
     // }
+    return ws;
 };
 
 var send = function send(ws, roomId, text, userId) {
     var now = new Date();
     var message = JSON.stringify({
         chat_room_id: roomId,
-        user_id: userId,
+        author_id: userId,
         text: text,
         created: now.toISOString()
     });

@@ -1,10 +1,15 @@
-const getWsConnection = (roomId) => {
+const getWsConnection = (roomId, dispatcher) => {
     const ws = new WebSocket(`ws://${window.location.host}/chat/ws?id=${roomId}`); //
 
     ws.addEventListener('message', function(e) {
         console.log('message comming!!!')
-        console.log(e)
-        // dispatchWsResponse(e)
+        const resp = JSON.parse(e.data);
+        console.log(resp)
+        if (resp.status == 'success') {
+            dispatcher(resp)
+            return
+        }
+        console.error(e)
     });
 
     // const btn = document.getElementById('btn-send')
@@ -34,13 +39,14 @@ const getWsConnection = (roomId) => {
     //     var element = document.getElementById('messages-block');
     //     element.appendChild(mesasgeHtml)
     // }
+    return ws
 }
 
 const send = (ws, roomId, text, userId) => {
     const now = new Date();
     const message = JSON.stringify({
         chat_room_id: roomId,
-        user_id: userId,
+        author_id: userId,
         text: text,
         created: now.toISOString()
     });

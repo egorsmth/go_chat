@@ -9,18 +9,21 @@ export default class SendMessageForm extends React.Component {
     onChange = (e) => {
         this.setState({
             input: e.target.value
-        })
+        });
     }
 
     onSubmit = (e) => {
-        e.preventDeafult();
-        this.props.submitMessage(this.state.input)
+        e.preventDefault();
+        this.props.submitMessage(this.state.input);
+        this.setState({
+            input: ''
+        });
     }
 
     render () {
         return <div className='row'>
-            <div className='col-12' onSubmit={this.onSubmit}>
-                <form>
+            <div className='col-12'>
+                <form onSubmit={this.onSubmit}>
                     <input value={this.state.input} onChange={this.onChange} />
                     <input type='submit' value='Send'/>
                 </form>
