@@ -24,6 +24,7 @@ func Chat(w http.ResponseWriter, r *http.Request) {
 	user, err := middleware.GetUserFromSession(r)
 	if err != nil {
 		http.Redirect(w, r, "/", 301)
+		return
 	}
 
 	t := template.New("chat")                           // Create a template.

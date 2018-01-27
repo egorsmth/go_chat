@@ -1,6 +1,8 @@
 import React from 'react';
 import ChatRooms from './components/chat-rooms'
 import ChatRoom from './components/chat-room'
+import { Menu } from './components/menu'
+import { Avatar } from './components/avatar'
 import { VIEW_CHAT_ROOMS, VIEW_CHAT_ROOM } from '../index'
 import { getWsConnection, send } from './wsController'
 
@@ -19,12 +21,10 @@ export default class App extends React.Component {
     wsMessageDispatch = resp => {
         switch (resp.type){
             case 'MESSEGE_RECIEVED':
-                const message = JSON.parse(resp.data)
+                const message = JSON.parse(resp.data);
                 const roomMessages = [...this.state.messages[message.chat_room_id], message];
-                const newMessages = Object.assign({}, this.state.messages, {
-                    [message.chat_room_id]: roomMessages
-                });
-
+                const newMessages = this.state.messages;
+                newMessages[message.chat_room_id] = roomMessages;
                 const chatRooms = this.state.chatRooms.map(room => {
                     if (room.id == message.chat_room_id) {
                         return {
@@ -67,6 +67,10 @@ export default class App extends React.Component {
 
     clickMyMessages = e => {
         e.preventDefault();
+        console.log('msg', this.state.ws)
+        if (this.state.ws) {
+            this.state.ws.close(1000) // normal close code
+        }
         this.setState({
             chatRooms: this.state.chatRooms,
             messages: this.state.messages,
@@ -96,13 +100,15 @@ export default class App extends React.Component {
     }
 
     render() {
-        return <div className="col-12">
-        <div className="col-3">
-            <h3>{this.props.user.username}</h3>
-            <a onClick={this.clickMyMessages}>My Messages</a>
-        </div>
-        <div className="col-9">
-            {this.renderAppBlock()}
+        return <div>
+        <Menu user={this.props.user} clickMyMessages={this.clickMyMessages}/>
+        <div className="row">
+            <div className="col-4">
+                <Avatar user={this.props.user}/>
+            </div>
+            <div className="col-8">
+                {this.renderAppBlock()}
+            </div>
         </div>
     </div>
         

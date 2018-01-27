@@ -17,7 +17,10 @@ export default class ChatRoom extends React.Component {
 
     render () {
         return <div id='chatRoom'>
-            {this.renderMessages()}
+            <div className="messages-scrollable">
+                {this.renderMessages()}
+            </div>
+            
             <SendMessageForm submitMessage={this.props.submitMessage}/>
         </div>
     }

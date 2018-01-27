@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"sync"
 
 	"github.com/egorsmth/go_chat/middleware"
 	"github.com/egorsmth/go_chat/models"
@@ -12,10 +13,17 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+type ResponseMessage struct {
+	Status string `json:"status"`
+	Type   string `json:"type"`
+	Data   string `json:"data"`
+}
+
 func HandleConnections(w http.ResponseWriter, r *http.Request) {
 	user, err := middleware.GetUserFromSession(r)
 	if err != nil {
 		http.Redirect(w, r, "/", 301)
+		return
 	}
 
 	params := r.URL.Query()
@@ -32,39 +40,30 @@ func HandleConnections(w http.ResponseWriter, r *http.Request) {
 	}
 	defer ws.Close()
 
+	var chatRoom shared.WsChatRoom
 	if chatRoom, ok := shared.WsChatRooms[chatRoomID]; ok {
-		chatRoom[ws] = true
+		chatRoom.Rooms[ws] = true
 	} else {
-		shared.WsChatRooms[chatRoomID] = make(map[*websocket.Conn]bool)
-		shared.WsChatRooms[chatRoomID][ws] = true
+		rooms := shared.WsChatRoom{&sync.Mutex{}, make(map[*websocket.Conn]bool)}
+		shared.WsChatRooms[chatRoomID] = rooms
+		shared.WsChatRooms[chatRoomID].Rooms[ws] = true
+		chatRoom = shared.WsChatRooms[chatRoomID]
 	}
 
-	broadcast := make(chan models.Message)
-	go handleMessages(shared.WsChatRooms[chatRoomID], broadcast, user)
-
 	for {
-		msg := models.Message{}
-		err := ws.ReadJSON(&msg)
+		_, message, err := ws.ReadMessage()
 		if err != nil {
-			log.Println("err while READing json from ws", err)
-			delete(shared.WsChatRooms[chatRoomID], ws)
+			log.Println("err read message", err)
+			delete(chatRoom.Rooms, ws)
 			break
 		}
-		broadcast <- msg
-	}
-	log.Printf("user id: %v disconected from chat room %v", *user.ID, chatRoomID)
-}
-
-type ResponseMessage struct {
-	Status string `json:"status"`
-	Type   string `json:"type"`
-	Data   string `json:"data"`
-}
-
-func handleMessages(clients map[*websocket.Conn]bool, broadcast chan models.Message, user *models.User) {
-	for {
-		msg := <-broadcast
-		log.Printf("user id: %v send messege %v", *user.ID, msg)
+		msg := models.Message{}
+		err = json.Unmarshal(message, &msg)
+		if err != nil {
+			log.Println("err while READing json from ws", err)
+			delete(chatRoom.Rooms, ws)
+			break
+		}
 		saved, err := msg.SaveMessage()
 		if err != nil {
 			log.Println("err while saving message", err)
@@ -73,13 +72,18 @@ func handleMessages(clients map[*websocket.Conn]bool, broadcast chan models.Mess
 		saved.User = *user
 		savedJSON, err := json.Marshal(saved)
 		rsp := ResponseMessage{"success", "MESSEGE_RECIEVED", string(savedJSON)}
-		for client := range clients {
-			err := client.WriteJSON(rsp)
+		chatRoom.Mu.Lock()
+		for conn := range chatRoom.Rooms {
+			err := conn.WriteJSON(rsp)
 			if err != nil {
 				log.Println("err while WRITEing json to ws", err)
-				client.Close()
-				delete(clients, client)
+				conn.Close()
+				delete(chatRoom.Rooms, conn)
+				break
 			}
 		}
+		chatRoom.Mu.Unlock()
 	}
+
+	log.Printf("user id: %v disconected from chat room %v", *user.ID, chatRoomID)
 }

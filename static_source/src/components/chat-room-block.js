@@ -7,10 +7,10 @@ export default class ChatRoomBlock extends React.Component {
         this.props.onClick(this.props.chatRoomData.id)
     }
 
-    renderMessageBody() {
+    render() {
         const message = this.props.chatRoomData.lastMessage
         if (!message) {
-            return <div className='col-12'>
+            return <div className='col-12' onClick={this.onClick}>
                 No messages yet!
             </div>
         }
@@ -19,20 +19,12 @@ export default class ChatRoomBlock extends React.Component {
             'msg-unread': message.status == 'unread'
         })
 
-        return <div className='col-12'>
+        return <div className='col-12' onClick={this.onClick}>
             <div className='col-4'>
-                <img src={message.author.avatar}/>
+                <img className="img-fluid" src={message.author.avatar}/>
                 {message.author.username} {message.created}
-            </div>
+            </div>,
             <div className={messageClassName}>{message.text}</div>
-        </div>
-    }
-
-    render() {
-        return <div className='row' onClick={this.onClick}>
-            <div className='col-12'>
-                {this.renderMessageBody()}
-            </div>
         </div>
     }
 }

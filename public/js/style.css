@@ -5552,8 +5552,6 @@ a.text-dark:focus, a.text-dark:hover {
 .invisible {
   visibility: hidden !important; }
 
-div {
-  border: 1px solid red; }
-
-.messadge {
-  border: 2px solid green; }
+.messages-scrollable {
+  height: 450px;
+  overflow-y: scroll; }

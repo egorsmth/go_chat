@@ -65,6 +65,21 @@
 /************************************************************************/
 /******/ ([
 /* 0 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process) {
+
+if (process.env.NODE_ENV === 'production') {
+  module.exports = __webpack_require__(17);
+} else {
+  module.exports = __webpack_require__(18);
+}
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
+
+/***/ }),
+/* 1 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -254,21 +269,6 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 1 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(process) {
-
-if (process.env.NODE_ENV === 'production') {
-  module.exports = __webpack_require__(17);
-} else {
-  module.exports = __webpack_require__(18);
-}
-
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
-
-/***/ }),
 /* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -312,7 +312,7 @@ if (process.env.NODE_ENV === 'production') {
   module.exports = __webpack_require__(22);
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
 /* 3 */
@@ -475,7 +475,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 module.exports = emptyObject;
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
 /* 6 */
@@ -535,7 +535,7 @@ function invariant(condition, format, a, b, c, d, e, f) {
 }
 
 module.exports = invariant;
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
 /* 7 */
@@ -604,7 +604,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 module.exports = warning;
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
 /* 8 */
@@ -622,7 +622,7 @@ var _reactDom = __webpack_require__(2);
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
-var _react = __webpack_require__(1);
+var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
@@ -706,7 +706,7 @@ function checkPropTypes(typeSpecs, values, location, componentName, getStack) {
 
 module.exports = checkPropTypes;
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
 /* 10 */
@@ -826,7 +826,7 @@ var EventListener = {
 };
 
 module.exports = EventListener;
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
 /* 12 */
@@ -1031,7 +1031,7 @@ module.exports = focusNode;
 /*
  Modernizr 3.0.0pre (Custom Build) | MIT
 */
-var aa=__webpack_require__(1),l=__webpack_require__(10),B=__webpack_require__(4),C=__webpack_require__(3),ba=__webpack_require__(11),da=__webpack_require__(12),ea=__webpack_require__(13),fa=__webpack_require__(14),ia=__webpack_require__(15),D=__webpack_require__(5);
+var aa=__webpack_require__(0),l=__webpack_require__(10),B=__webpack_require__(4),C=__webpack_require__(3),ba=__webpack_require__(11),da=__webpack_require__(12),ea=__webpack_require__(13),fa=__webpack_require__(14),ia=__webpack_require__(15),D=__webpack_require__(5);
 function E(a){for(var b=arguments.length-1,c="Minified React error #"+a+"; visit http://facebook.github.io/react/docs/error-decoder.html?invariant\x3d"+a,d=0;d<b;d++)c+="\x26args[]\x3d"+encodeURIComponent(arguments[d+1]);b=Error(c+" for the full message or use the non-minified dev environment for full errors and additional helpful warnings.");b.name="Invariant Violation";b.framesToPop=1;throw b;}aa?void 0:E("227");
 var oa={children:!0,dangerouslySetInnerHTML:!0,defaultValue:!0,defaultChecked:!0,innerHTML:!0,suppressContentEditableWarning:!0,suppressHydrationWarning:!0,style:!0};function pa(a,b){return(a&b)===b}
 var ta={MUST_USE_PROPERTY:1,HAS_BOOLEAN_VALUE:4,HAS_NUMERIC_VALUE:8,HAS_POSITIVE_NUMERIC_VALUE:24,HAS_OVERLOADED_BOOLEAN_VALUE:32,HAS_STRING_BOOLEAN_VALUE:64,injectDOMPropertyConfig:function(a){var b=ta,c=a.Properties||{},d=a.DOMAttributeNamespaces||{},e=a.DOMAttributeNames||{};a=a.DOMMutationMethods||{};for(var f in c){ua.hasOwnProperty(f)?E("48",f):void 0;var g=f.toLowerCase(),h=c[f];g={attributeName:g,attributeNamespace:null,propertyName:f,mutationMethod:null,mustUseProperty:pa(h,b.MUST_USE_PROPERTY),
@@ -2641,7 +2641,7 @@ module.exports = react;
   })();
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
 /* 19 */
@@ -2740,7 +2740,7 @@ if (process.env.NODE_ENV !== "production") {
   (function() {
 'use strict';
 
-var React = __webpack_require__(1);
+var React = __webpack_require__(0);
 var invariant = __webpack_require__(6);
 var warning = __webpack_require__(7);
 var ExecutionEnvironment = __webpack_require__(10);
@@ -18118,7 +18118,7 @@ module.exports = reactDom;
   })();
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
 /* 23 */
@@ -34865,7 +34865,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _react = __webpack_require__(1);
+var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
@@ -34877,13 +34877,15 @@ var _chatRoom = __webpack_require__(36);
 
 var _chatRoom2 = _interopRequireDefault(_chatRoom);
 
+var _menu = __webpack_require__(39);
+
+var _avatar = __webpack_require__(40);
+
 var _index = __webpack_require__(8);
 
-var _wsController = __webpack_require__(39);
+var _wsController = __webpack_require__(41);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
@@ -34908,8 +34910,8 @@ var App = function (_React$Component) {
                 case 'MESSEGE_RECIEVED':
                     var message = JSON.parse(resp.data);
                     var roomMessages = [].concat(_toConsumableArray(_this.state.messages[message.chat_room_id]), [message]);
-                    var newMessages = Object.assign({}, _this.state.messages, _defineProperty({}, message.chat_room_id, roomMessages));
-
+                    var newMessages = _this.state.messages;
+                    newMessages[message.chat_room_id] = roomMessages;
                     var chatRooms = _this.state.chatRooms.map(function (room) {
                         if (room.id == message.chat_room_id) {
                             return {
@@ -34952,6 +34954,10 @@ var App = function (_React$Component) {
 
         _this.clickMyMessages = function (e) {
             e.preventDefault();
+            console.log('msg', _this.state.ws);
+            if (_this.state.ws) {
+                _this.state.ws.close(1000); // normal close code
+            }
             _this.setState({
                 chatRooms: _this.state.chatRooms,
                 messages: _this.state.messages,
@@ -34997,25 +35003,21 @@ var App = function (_React$Component) {
         value: function render() {
             return _react2.default.createElement(
                 'div',
-                { className: 'col-12' },
+                null,
+                _react2.default.createElement(_menu.Menu, { user: this.props.user, clickMyMessages: this.clickMyMessages }),
                 _react2.default.createElement(
                     'div',
-                    { className: 'col-3' },
+                    { className: 'row' },
                     _react2.default.createElement(
-                        'h3',
-                        null,
-                        this.props.user.username
+                        'div',
+                        { className: 'col-4' },
+                        _react2.default.createElement(_avatar.Avatar, { user: this.props.user })
                     ),
                     _react2.default.createElement(
-                        'a',
-                        { onClick: this.clickMyMessages },
-                        'My Messages'
+                        'div',
+                        { className: 'col-8' },
+                        this.renderAppBlock()
                     )
-                ),
-                _react2.default.createElement(
-                    'div',
-                    { className: 'col-9' },
-                    this.renderAppBlock()
                 )
             );
         }
@@ -35043,7 +35045,7 @@ var _reactDom = __webpack_require__(2);
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
-var _react = __webpack_require__(1);
+var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
@@ -35127,7 +35129,7 @@ var _reactDom = __webpack_require__(2);
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
-var _react = __webpack_require__(1);
+var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
@@ -35163,13 +35165,13 @@ var ChatRoomBlock = function (_React$Component) {
     }
 
     _createClass(ChatRoomBlock, [{
-        key: 'renderMessageBody',
-        value: function renderMessageBody() {
+        key: 'render',
+        value: function render() {
             var message = this.props.chatRoomData.lastMessage;
             if (!message) {
                 return _react2.default.createElement(
                     'div',
-                    { className: 'col-12' },
+                    { className: 'col-12', onClick: this.onClick },
                     'No messages yet!'
                 );
             }
@@ -35180,32 +35182,20 @@ var ChatRoomBlock = function (_React$Component) {
 
             return _react2.default.createElement(
                 'div',
-                { className: 'col-12' },
+                { className: 'col-12', onClick: this.onClick },
                 _react2.default.createElement(
                     'div',
                     { className: 'col-4' },
-                    _react2.default.createElement('img', { src: message.author.avatar }),
+                    _react2.default.createElement('img', { className: 'img-fluid', src: message.author.avatar }),
                     message.author.username,
                     ' ',
                     message.created
                 ),
+                ',',
                 _react2.default.createElement(
                     'div',
                     { className: messageClassName },
                     message.text
-                )
-            );
-        }
-    }, {
-        key: 'render',
-        value: function render() {
-            return _react2.default.createElement(
-                'div',
-                { className: 'row', onClick: this.onClick },
-                _react2.default.createElement(
-                    'div',
-                    { className: 'col-12' },
-                    this.renderMessageBody()
                 )
             );
         }
@@ -35288,7 +35278,7 @@ var _reactDom = __webpack_require__(2);
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
-var _react = __webpack_require__(1);
+var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
@@ -35337,7 +35327,11 @@ var ChatRoom = function (_React$Component) {
             return _react2.default.createElement(
                 'div',
                 { id: 'chatRoom' },
-                this.renderMessages(),
+                _react2.default.createElement(
+                    'div',
+                    { className: 'messages-scrollable' },
+                    this.renderMessages()
+                ),
                 _react2.default.createElement(_sendMessageForm2.default, { submitMessage: this.props.submitMessage })
             );
         }
@@ -35365,7 +35359,7 @@ var _reactDom = __webpack_require__(2);
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
-var _react = __webpack_require__(1);
+var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
@@ -35392,22 +35386,18 @@ var Message = function (_React$Component) {
             var message = this.props.messageData;
             return _react2.default.createElement(
                 'div',
-                { className: 'row' },
+                { className: 'col-12' },
                 _react2.default.createElement(
                     'div',
-                    { className: 'col-12' },
-                    _react2.default.createElement(
-                        'div',
-                        { className: 'col-4' },
-                        message.author.avatar,
-                        message.author.username,
-                        message.created
-                    ),
-                    _react2.default.createElement(
-                        'div',
-                        { className: 'col-8' },
-                        message.text
-                    )
+                    { className: 'col-4' },
+                    message.author.avatar,
+                    message.author.username,
+                    message.created
+                ),
+                _react2.default.createElement(
+                    'div',
+                    { className: 'col-8' },
+                    message.text
                 )
             );
         }
@@ -35435,7 +35425,7 @@ var _reactDom = __webpack_require__(2);
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
-var _react = __webpack_require__(1);
+var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
@@ -35503,6 +35493,117 @@ exports.default = SendMessageForm;
 
 /***/ }),
 /* 39 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.Menu = undefined;
+
+var _reactDom = __webpack_require__(2);
+
+var _reactDom2 = _interopRequireDefault(_reactDom);
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var Menu = function Menu(props) {
+    return _react2.default.createElement(
+        'nav',
+        { className: 'navbar navbar-expand-md navbar-light bg-faded' },
+        _react2.default.createElement(
+            'button',
+            { className: 'navbar-toggler navbar-toggler-right', type: 'button', 'data-toggle': 'collapse',
+                'data-target': '#navbarSupportedContent', 'aria-controls': 'navbarSupportedContent', 'aria-expanded': 'true',
+                'aria-label': 'Toggle navigation' },
+            _react2.default.createElement('span', { className: 'navbar-toggler-icon' })
+        ),
+        _react2.default.createElement(
+            'a',
+            { className: 'navbar-brand', href: '/user/' + props.user.id + '/' },
+            props.user.username
+        ),
+        _react2.default.createElement(
+            'div',
+            { className: 'collapse navbar-collapse', id: 'navbarSupportedContent' },
+            _react2.default.createElement(
+                'ul',
+                { className: 'navbar-nav mr-auto' },
+                _react2.default.createElement(
+                    'li',
+                    { className: 'nav-item' },
+                    _react2.default.createElement(
+                        'a',
+                        { className: 'nav-link', href: '/user/members/' },
+                        'Members'
+                    )
+                ),
+                _react2.default.createElement(
+                    'li',
+                    { className: 'nav-item' },
+                    _react2.default.createElement(
+                        'a',
+                        { className: 'nav-link', href: '/user/friends/' },
+                        'Friends'
+                    )
+                ),
+                _react2.default.createElement(
+                    'li',
+                    { className: 'nav-item' },
+                    _react2.default.createElement(
+                        'a',
+                        { className: 'nav-link', onClick: props.clickMyMessages },
+                        'My messages'
+                    )
+                )
+            )
+        ),
+        _react2.default.createElement(
+            'a',
+            { className: 'nav-link', href: '/logout/' },
+            'Logout'
+        )
+    );
+};
+
+exports.Menu = Menu;
+
+/***/ }),
+/* 40 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.Avatar = undefined;
+
+var _reactDom = __webpack_require__(2);
+
+var _reactDom2 = _interopRequireDefault(_reactDom);
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var Avatar = function Avatar(props) {
+    return _react2.default.createElement('img', { className: 'img-fluid', src: props.user.avatar, alt: '' });
+};
+
+exports.Avatar = Avatar;
+
+/***/ }),
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
