@@ -19,7 +19,7 @@ const Menu = (props) => {
                         <a className="nav-link" href="/user/friends/">Friends</a>
                     </li>
                     <li className="nav-item">
-                        <a className="nav-link" onClick={props.clickMyMessages}>My messages</a>
+                        <a className="nav-link" onClick={props.clickMyMessages}>My messages <span className="badge badge-primary">{props.unreadCount}</span></a>
                     </li>
                 </ul>
             </div>

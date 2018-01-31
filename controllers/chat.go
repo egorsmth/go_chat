@@ -11,8 +11,9 @@ import (
 )
 
 type appData struct {
-	ChatRooms *[]models.ChatRoom            `json:"chatRooms,omitonempty"`
-	Messages  *map[string]*[]models.Message `json:"messages"`
+	ChatRooms   *[]models.ChatRoom            `json:"chatRooms,omitonempty"`
+	Messages    *map[string]*[]models.Message `json:"messages"`
+	UnreadCount int                           `json:"unreadCount,string"`
 }
 
 type chatResponse struct {
@@ -36,7 +37,7 @@ func Chat(w http.ResponseWriter, r *http.Request) {
 	cr := chatResponse{}
 	appData := appData{}
 
-	chatRooms, chatRoomsID, err := models.GetChatRooms(user)
+	chatRooms, chatRoomsID, unredCount, err := models.GetChatRooms(user)
 	if err != nil {
 		log.Println("err while getting initial chat rooms:", err)
 	}
@@ -48,6 +49,7 @@ func Chat(w http.ResponseWriter, r *http.Request) {
 
 	appData.ChatRooms = chatRooms
 	appData.Messages = messages
+	appData.UnreadCount = unredCount
 
 	jsonAppData, err := json.Marshal(appData)
 	if err != nil {

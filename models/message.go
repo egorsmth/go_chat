@@ -15,18 +15,18 @@ type Message struct {
 	AuthorID   *int       `json:"author_id,string"`
 	ChatRoomID *int       `json:"chat_room_id,string"`
 	Message    *string    `json:"text"`
+	Status     *string    `json:"status"`
 	Date       *time.Time `json:"created,time"`
 }
 
 func (msg Message) SaveMessage() (*Message, error) {
-	log.Println("msg", msg)
 	tx, err := shared.Db.Begin()
 	if err != nil {
 		log.Println("Can't start transaction while saving message", err)
 		return nil, err
 	}
 	var lastMessageID int
-	err = shared.Db.QueryRow("insert into user_profile_message (user_id, chat_room_id, message, created_at) values ($1, $2, $3, $4) RETURNING id", msg.AuthorID, msg.ChatRoomID, msg.Message, msg.Date).Scan(&lastMessageID)
+	err = shared.Db.QueryRow("insert into user_profile_message (user_id, chat_room_id, message, status, created_at) values ($1, $2, $3, $4, $5) RETURNING id", msg.AuthorID, msg.ChatRoomID, msg.Message, msg.Status, msg.Date).Scan(&lastMessageID)
 	if err != nil {
 		tx.Rollback()
 		log.Println("error while saving message", err)
@@ -38,7 +38,6 @@ func (msg Message) SaveMessage() (*Message, error) {
 		log.Println("error getting id of messgae while saving message", err)
 		return nil, err
 	}
-	log.Println(lastMessageID)
 	_, err = shared.Db.Exec("update user_profile_chatroom set last_message_id=$1 where id=$2", lastMessageID, msg.ChatRoomID)
 	if err != nil {
 		tx.Rollback()
@@ -52,7 +51,7 @@ func (msg Message) SaveMessage() (*Message, error) {
 }
 
 func GetMessagesByChatRoomID(ID int) (*[]Message, error) {
-	rows, err := shared.Db.Query("select username, user_id, chat_room_id, message, created_at, avatar from user_profile_message "+
+	rows, err := shared.Db.Query("select username, user_id, chat_room_id, message, status, created_at, avatar from user_profile_message "+
 		"join auth_user on auth_user.id=user_id "+
 		"left join user_profile_profile on user_profile_profile.user_id=user_id "+
 		"where chat_room_id=$1 "+
@@ -65,11 +64,12 @@ func GetMessagesByChatRoomID(ID int) (*[]Message, error) {
 	for rows.Next() {
 		usr := User{}
 		msg := Message{}
-		err := rows.Scan(&usr.Username, &msg.AuthorID, &msg.ChatRoomID, &msg.Message, &msg.Date, &usr.Avatar)
+		err := rows.Scan(&usr.Username, &msg.AuthorID, &msg.ChatRoomID, &msg.Message, &msg.Status, &msg.Date, &usr.Avatar)
 		if err != nil {
 			log.Println("error while scan message for chat ", ID)
 			return nil, err
 		}
+		usr.ID = msg.AuthorID
 		msg.User = usr
 		messages = append(messages, msg)
 	}
@@ -81,7 +81,7 @@ func GetMessagesByChatRoomID(ID int) (*[]Message, error) {
 }
 
 func GetMessages(roomsIds *[]int) (*map[string]*[]Message, error) {
-	buf := bytes.NewBufferString("select user_profile_message.id, username, user_profile_message.user_id, chat_room_id, message, created_at, avatar " +
+	buf := bytes.NewBufferString("select user_profile_message.id, username, user_profile_message.user_id, chat_room_id, message, status, created_at, avatar " +
 		"from user_profile_message " +
 		"join auth_user on auth_user.id=user_profile_message.user_id " +
 		"left join user_profile_profile on user_profile_profile.user_id=user_profile_message.user_id " +
@@ -103,11 +103,12 @@ func GetMessages(roomsIds *[]int) (*map[string]*[]Message, error) {
 	for rows.Next() {
 		usr := User{}
 		msg := Message{}
-		err = rows.Scan(&msg.ID, &usr.Username, &msg.AuthorID, &msg.ChatRoomID, &msg.Message, &msg.Date, &usr.Avatar)
+		err = rows.Scan(&msg.ID, &usr.Username, &msg.AuthorID, &msg.ChatRoomID, &msg.Message, &msg.Status, &msg.Date, &usr.Avatar)
 		if err != nil {
 			log.Println("error while scan messages for chats")
 			return nil, err
 		}
+		usr.ID = msg.AuthorID
 		msg.User = usr
 		intID := strconv.Itoa(*msg.ChatRoomID)
 		if _, exist := messages[intID]; !exist {
@@ -123,4 +124,17 @@ func GetMessages(roomsIds *[]int) (*map[string]*[]Message, error) {
 	}
 
 	return &messages, nil
+}
+
+func ReadMessages(ids []int) error {
+	buf := bytes.NewBufferString("update user_profile_message set status='read' where id in (")
+	for i, v := range ids {
+		if i > 0 {
+			buf.WriteString(",")
+		}
+		buf.WriteString(strconv.Itoa(v))
+	}
+	buf.WriteString(")")
+	_, err := shared.Db.Exec(buf.String())
+	return err
 }

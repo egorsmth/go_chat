@@ -12,47 +12,49 @@ const getWsConnection = (roomId, dispatcher) => {
         console.error(e)
     });
 
-    // const btn = document.getElementById('btn-send')
-    // btn.addEventListener('click', (e) => {
-    //     console.log('clicked')
-    //     const inp = document.getElementById('inp-msg').value
-    //     console.log(inp)
-    //     if (inp != '') {
-    //         const now = new Date();
-    //         console.log(now.toISOString())
-    //         ws.send(
-    //             JSON.stringify({
-    //                 chat_room_id: window.chat_room_id,
-    //                 user_id: window.user_id,
-    //                 message: inp,
-    //                 created: now.toISOString()
-    //             })
-    //         );
-    //         document.getElementById('inp-msg').value = ''; // Reset newMsg
-    //     }
-    // });
-
-    // dispatchWsResponse = (msgResponse) => {
-    //     var msg = JSON.parse(e.data);
-    //     var mesasgeHtml = document.createElement('div');
-    //     mesasgeHtml.innerHTML = `<p>${msg.username}</p><p>${msg.message}</p><p>${msg.created}</p>`;
-    //     var element = document.getElementById('messages-block');
-    //     element.appendChild(mesasgeHtml)
-    // }
     return ws
 }
 
-const send = (ws, roomId, text, userId) => {
-    const now = new Date();
-    const message = JSON.stringify({
-        chat_room_id: roomId,
-        author_id: userId,
-        text: text,
-        created: now.toISOString()
-    });
-    console.log('send!!!!')
-    console.log(message)
-    ws.send(message);
+const wait = (ws, cb) => {
+    if (ws.readyState !== 1) {
+        setTimeout(cb, 1000);
+    } else {
+        cb()
+    }
 }
 
-export { getWsConnection, send }
+const send = (ws, roomId, text, userId) => {
+    wait(ws, () => {
+        const now = new Date();
+        const message = JSON.stringify({
+            action: 'send',
+            data: {
+                chat_room_id: roomId,
+                author_id: userId,
+                text: text,
+                status: 'unread',
+                created: now.toISOString()
+            },
+        });
+        console.log('send!!!!')
+        console.log(message)
+        ws.send(message);
+    });
+}
+
+const makeRead = (ws, roomId, messageIds) => {
+    wait(ws, () => {
+        const message = JSON.stringify({
+            action: 'read',
+            data: {
+                messageIds: messageIds,
+                roomId: roomId,
+            }
+        });
+        console.log('send!!!!')
+        console.log(message)
+        ws.send(message)
+    });
+}
+
+export { getWsConnection, send, makeRead }
