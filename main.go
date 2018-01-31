@@ -45,44 +45,13 @@ func printHeaders(w http.ResponseWriter, r *http.Request) {
 func main() {
 	shared.Init("user=root password=root dbname=social_net sslmode=disable")
 	http.HandleFunc("/chat/", controllers.Chat)
-	//http.Handle("/chat_rooms", http.HandlerFunc(controllers.ChatRooms))
 	fs := http.FileServer(http.Dir("public"))
 	http.Handle("/", fs)
 
-	//
-	// http.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-	// 	log.Println("serving file...")
-	// 	fs.ServeHTTP(w, r)
-	// 	log.Println("done serving...ZZZZ")
-	// 	print_headers(w, r)
-	// }))
-
 	http.HandleFunc("/chat/ws", controllers.HandleConnections)
-	// go handleMessages()
 	log.Print("http server started on :8081")
 	err := http.ListenAndServe(":8081", nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
 }
-
-// func handleConnections(w http.ResponseWriter, r *http.Request) {
-// 	ws, err := upgrader.Upgrade(w, r, nil)
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-
-// 	defer ws.Close()
-
-// 	clients[ws] = true
-// 	for {
-// 		var msg Message
-// 		err := ws.ReadJSON(&msg)
-// 		if err != nil {
-// 			log.Fatal(err)
-// 			delete(clients, ws)
-// 			break
-// 		}
-// 		broadcast <- msg
-// 	}
-// }
