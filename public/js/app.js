@@ -35003,7 +35003,7 @@ var App = function (_React$Component) {
         value: function render() {
             return _react2.default.createElement(
                 'div',
-                null,
+                { className: 'col-12' },
                 _react2.default.createElement(_menu.Menu, { user: this.props.user, clickMyMessages: this.clickMyMessages }),
                 _react2.default.createElement(
                     'div',
@@ -35101,7 +35101,7 @@ var ChatRooms = function (_React$Component) {
         value: function render() {
             return _react2.default.createElement(
                 'div',
-                { id: 'chatRooms' },
+                { id: 'chatRooms', className: 'col-12' },
                 this.renderChatRooms()
             );
         }
@@ -35171,7 +35171,7 @@ var ChatRoomBlock = function (_React$Component) {
             if (!message) {
                 return _react2.default.createElement(
                     'div',
-                    { className: 'col-12', onClick: this.onClick },
+                    { className: 'row', onClick: this.onClick },
                     'No messages yet!'
                 );
             }
@@ -35182,16 +35182,15 @@ var ChatRoomBlock = function (_React$Component) {
 
             return _react2.default.createElement(
                 'div',
-                { className: 'col-12', onClick: this.onClick },
+                { className: 'row', onClick: this.onClick },
                 _react2.default.createElement(
                     'div',
                     { className: 'col-4' },
-                    _react2.default.createElement('img', { className: 'img-fluid', src: message.author.avatar }),
+                    _react2.default.createElement('img', { className: 'img-fluid', src: '/' + message.author.avatar }),
                     message.author.username,
                     ' ',
                     message.created
                 ),
-                ',',
                 _react2.default.createElement(
                     'div',
                     { className: messageClassName },
@@ -35326,10 +35325,10 @@ var ChatRoom = function (_React$Component) {
         value: function render() {
             return _react2.default.createElement(
                 'div',
-                { id: 'chatRoom' },
+                { id: 'chatRoom', className: 'row' },
                 _react2.default.createElement(
                     'div',
-                    { className: 'messages-scrollable' },
+                    { className: 'messages-scrollable col-12' },
                     this.renderMessages()
                 ),
                 _react2.default.createElement(_sendMessageForm2.default, { submitMessage: this.props.submitMessage })
@@ -35384,13 +35383,17 @@ var Message = function (_React$Component) {
         key: 'render',
         value: function render() {
             var message = this.props.messageData;
+            var messageClassName = cn({
+                'row': true,
+                'msg-unread': message.status == 'unread'
+            });
             return _react2.default.createElement(
                 'div',
-                { className: 'col-12' },
+                { className: messageClassName },
                 _react2.default.createElement(
                     'div',
                     { className: 'col-4' },
-                    message.author.avatar,
+                    _react2.default.createElement('img', { className: 'img-fluid', src: '/' + message.author.avatar }),
                     message.author.username,
                     message.created
                 ),
@@ -35515,59 +35518,63 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var Menu = function Menu(props) {
     return _react2.default.createElement(
-        'nav',
-        { className: 'navbar navbar-expand-md navbar-light bg-faded' },
+        'div',
+        { className: 'row' },
         _react2.default.createElement(
-            'button',
-            { className: 'navbar-toggler navbar-toggler-right', type: 'button', 'data-toggle': 'collapse',
-                'data-target': '#navbarSupportedContent', 'aria-controls': 'navbarSupportedContent', 'aria-expanded': 'true',
-                'aria-label': 'Toggle navigation' },
-            _react2.default.createElement('span', { className: 'navbar-toggler-icon' })
-        ),
-        _react2.default.createElement(
-            'a',
-            { className: 'navbar-brand', href: '/user/' + props.user.id + '/' },
-            props.user.username
-        ),
-        _react2.default.createElement(
-            'div',
-            { className: 'collapse navbar-collapse', id: 'navbarSupportedContent' },
+            'nav',
+            { className: 'navbar navbar-expand-md navbar-light bg-faded col-12' },
             _react2.default.createElement(
-                'ul',
-                { className: 'navbar-nav mr-auto' },
+                'button',
+                { className: 'navbar-toggler navbar-toggler-right', type: 'button', 'data-toggle': 'collapse',
+                    'data-target': '#navbarSupportedContent', 'aria-controls': 'navbarSupportedContent', 'aria-expanded': 'true',
+                    'aria-label': 'Toggle navigation' },
+                _react2.default.createElement('span', { className: 'navbar-toggler-icon' })
+            ),
+            _react2.default.createElement(
+                'a',
+                { className: 'navbar-brand', href: '/user/' + props.user.id + '/' },
+                props.user.username
+            ),
+            _react2.default.createElement(
+                'div',
+                { className: 'collapse navbar-collapse', id: 'navbarSupportedContent' },
                 _react2.default.createElement(
-                    'li',
-                    { className: 'nav-item' },
+                    'ul',
+                    { className: 'navbar-nav mr-auto' },
                     _react2.default.createElement(
-                        'a',
-                        { className: 'nav-link', href: '/user/members/' },
-                        'Members'
-                    )
-                ),
-                _react2.default.createElement(
-                    'li',
-                    { className: 'nav-item' },
+                        'li',
+                        { className: 'nav-item' },
+                        _react2.default.createElement(
+                            'a',
+                            { className: 'nav-link', href: '/user/members/' },
+                            'Members'
+                        )
+                    ),
                     _react2.default.createElement(
-                        'a',
-                        { className: 'nav-link', href: '/user/friends/' },
-                        'Friends'
-                    )
-                ),
-                _react2.default.createElement(
-                    'li',
-                    { className: 'nav-item' },
+                        'li',
+                        { className: 'nav-item' },
+                        _react2.default.createElement(
+                            'a',
+                            { className: 'nav-link', href: '/user/friends/' },
+                            'Friends'
+                        )
+                    ),
                     _react2.default.createElement(
-                        'a',
-                        { className: 'nav-link', onClick: props.clickMyMessages },
-                        'My messages'
+                        'li',
+                        { className: 'nav-item' },
+                        _react2.default.createElement(
+                            'a',
+                            { className: 'nav-link', onClick: props.clickMyMessages },
+                            'My messages'
+                        )
                     )
                 )
+            ),
+            _react2.default.createElement(
+                'a',
+                { className: 'nav-link', href: '/logout/' },
+                'Logout'
             )
-        ),
-        _react2.default.createElement(
-            'a',
-            { className: 'nav-link', href: '/logout/' },
-            'Logout'
         )
     );
 };
@@ -35597,7 +35604,8 @@ var _react2 = _interopRequireDefault(_react);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var Avatar = function Avatar(props) {
-    return _react2.default.createElement('img', { className: 'img-fluid', src: props.user.avatar, alt: '' });
+    console.log(props);
+    return _react2.default.createElement('img', { className: 'img-fluid', src: '/' + props.user.avatar, alt: '' });
 };
 
 exports.Avatar = Avatar;

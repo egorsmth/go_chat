@@ -5553,5 +5553,5 @@ a.text-dark:focus, a.text-dark:hover {
   visibility: hidden !important; }
 
 .messages-scrollable {
-  height: 450px;
+  height: 80%;
   overflow-y: scroll; }

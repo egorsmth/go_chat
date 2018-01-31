@@ -100,7 +100,7 @@ export default class App extends React.Component {
     }
 
     render() {
-        return <div>
+        return <div className='col-12'>
         <Menu user={this.props.user} clickMyMessages={this.clickMyMessages}/>
         <div className="row">
             <div className="col-4">

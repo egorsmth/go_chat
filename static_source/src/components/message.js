@@ -4,9 +4,13 @@ import React from 'react';
 export default class Message extends React.Component {
     render() {
         const message = this.props.messageData
-        return <div className='col-12'>
+        const messageClassName = cn({
+            'row': true,
+            'msg-unread': message.status == 'unread'
+        })
+        return <div className={messageClassName} >
             <div className='col-4'>
-                {message.author.avatar}
+            <img className='img-fluid' src={`/${message.author.avatar}`} />
                 {message.author.username}
                 {message.created}
             </div>

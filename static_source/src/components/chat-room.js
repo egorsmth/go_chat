@@ -16,8 +16,8 @@ export default class ChatRoom extends React.Component {
     }
 
     render () {
-        return <div id='chatRoom'>
-            <div className="messages-scrollable">
+        return <div id='chatRoom' className='row'>
+            <div className="messages-scrollable col-12">
                 {this.renderMessages()}
             </div>
             

@@ -25,14 +25,16 @@ type userSess struct {
 type User struct {
 	ID       *int    `json:"id,string"`
 	Username *string `json:"username"`
-	Avatar   *string `json:"avatar,string"`
+	Avatar   *string `json:"avatar"`
 }
 
 // GetUserByID get user by id
 func GetUserByID(id string) (*User, error) {
-	row := shared.Db.QueryRow("select id, username from auth_user where id=$1", id)
+	row := shared.Db.QueryRow("select id, username, avatar from auth_user "+
+		"join user_profile_profile on user_id=auth_user.id "+
+		"where auth_user.id=$1", id)
 	user := User{}
-	err := row.Scan(&user.ID, &user.Username)
+	err := row.Scan(&user.ID, &user.Username, &user.Avatar)
 	if err != nil {
 		return nil, err
 	}

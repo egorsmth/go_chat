@@ -17,7 +17,7 @@ export default class ChatRooms extends React.Component {
     }
 
     render () {
-        return <div id='chatRooms'>
+        return <div id='chatRooms' className='col-12'>
             {this.renderChatRooms()}
         </div>
     }
