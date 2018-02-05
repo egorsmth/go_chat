@@ -1,10 +1,14 @@
 @import "~bootstrap/scss/bootstrap";
 
 .messages-scrollable {
-    height: 80%;
-    overflow-y: scroll;
+    height: 80% !important;
+    overflow: auto;
 }
 
 .msg-unread {
     background-color: lightblue;
+}
+
+.avatar-thumbnail {
+    width: 50px;
 }

@@ -8,7 +8,6 @@ import { getWsConnection, send, makeRead } from './wsController'
 
 export default class App extends React.Component {
     constructor(props) {
-        console.log(props.appData)
         super(props);
         this.state = {
             chatRooms: props.appData.chatRooms,
@@ -19,71 +18,89 @@ export default class App extends React.Component {
         }
     }
 
+    dispatcherRecieved (resp) {
+        const message = JSON.parse(resp.data);
+        const roomMessages = [...this.state.messages[message.chat_room_id], message];
+        let newMessages = this.state.messages;
+        let recieved = 0;
+        newMessages[message.chat_room_id] = roomMessages;
+        let chatRooms = this.state.chatRooms.map(room => {
+            if (room.id == message.chat_room_id) {
+                if (message.author.id != this.props.user.id) {
+                    recieved = 1;
+                }
+                return {
+                    id: room.id,
+                    lastMessage: message,
+                    lastMessageId: message.id,
+                    status: room.status
+                }
+            }
+            return room
+        })
+        this.handleUnreadMessages(this.state.ws, this.state.roomId, newMessages[this.state.roomId])
+        this.setState({
+            chatRooms: chatRooms,
+            messages: newMessages,
+            unreadCount: this.state.unreadCount + recieved,
+            view: this.state.view,
+            roomId: this.state.roomId,
+            ws: this.state.ws,
+        });
+    }
+
+    dispatcherReaded(resp) {
+        const data = JSON.parse(resp.data);
+        const ids = data.messageIds;
+        let readed = 0;
+        newMessages = this.state.messages;
+        newMessages[data.roomId] = newMessages[data.roomId].map(msg => {
+            if (ids.includes(msg.id)) {
+                if (msg.author.id != this.props.user.id) {
+                    readed = 1;
+                }
+                msg.status = 'read'
+            }
+            return msg
+        });
+        chatRooms = this.state.chatRooms.map(room => {
+            if (room.id == data.roomId) {
+                room.lastMessage = newMessages[data.roomId][newMessages[data.roomId].length - 1]
+            }
+            return room
+        })
+        this.setState({
+            chatRooms: chatRooms,
+            messages: newMessages,
+            unreadCount: this.state.unreadCount - readed,
+            view: this.state.view,
+            roomId: this.state.roomId,
+            ws: this.state.ws,
+        });
+    }
+
     wsMessageDispatch = resp => {
-        switch (resp.type){
+        switch (resp.type) {
             case 'MESSEGE_RECIEVED':
-                const message = JSON.parse(resp.data);
-                const roomMessages = [...this.state.messages[message.chat_room_id], message];
-                let newMessages = this.state.messages;
-                newMessages[message.chat_room_id] = roomMessages;
-                let chatRooms = this.state.chatRooms.map(room => {
-                    if (room.id == message.chat_room_id) {
-                        return {
-                            id: room.id,
-                            lastMessage: message,
-                            lastMessageId: message.id,
-                            status: room.status
-                        }
-                    }
-                    return room
-                })
-                this.setState({
-                    chatRooms: chatRooms,
-                    messages: newMessages,
-                    unreadCount: this.state.unreadCount,
-                    view: this.state.view,
-                    roomId: this.state.roomId,
-                    ws: this.state.ws,
-                });
+                this.dispatcherRecieved(resp)
                 break
             case 'TYPING':
                 break
             case 'MESSEGE_READED':
-                const data = JSON.parse(resp.data);
-                const ids = data.messageIds;
-                newMessages = this.state.messages;
-                newMessages[data.roomId] = newMessages[data.roomId].map(msg => {
-                    if (ids.includes(msg.id)) {
-                        msg.status = 'read'
-                    }
-                    return msg
-                });
-                chatRooms = this.state.chatRooms.map(room => {
-                    if (room.id == data.roomId) {
-                        room.lastMessage = newMessages[data.roomId][newMessages[data.roomId].length - 1]
-                    }
-                    return room
-                })
-                this.setState({
-                    chatRooms: chatRooms,
-                    messages: newMessages,
-                    unreadCount: this.state.unreadCount-1,
-                    view: this.state.view,
-                    roomId: this.state.roomId,
-                    ws: this.state.ws,
-                });
+                this.dispatcherReaded(resp)
                 break
         }
     }
 
-    isLastMessageUnred (msg, usr) {
-        console.log(msg.author.id, user.id)
-        console.log(msg.author.id != user.id)
+    isLastMessageUnread (msg, user) {
         return msg.status == 'unread' && msg.author.id != user.id;
     }
 
     handleUnreadMessages (ws, roomId, messages) {
-        if (this.isLastMessageUnred(messages[messages.length - 1], this.props.user)) {
+        if (!messages) {
+            return
+        }
+        if (this.isLastMessageUnread(messages[messages.length - 1], this.props.user)) {
             const ids = messages
             .filter(msg => {
                 return msg.status == 'unread'
@@ -110,7 +127,6 @@ export default class App extends React.Component {
 
     clickMyMessages = e => {
         e.preventDefault();
-        console.log('msg', this.state.ws)
         if (this.state.ws) {
             this.state.ws.close(1000) // normal close code
         }

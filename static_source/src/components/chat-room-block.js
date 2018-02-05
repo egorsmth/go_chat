@@ -21,7 +21,7 @@ export default class ChatRoomBlock extends React.Component {
 
         return <div className='row' onClick={this.onClick}>
             <div className='col-4'>
-                <img className="img-fluid" src={`/${message.author.avatar}`} />
+                <img className='avatar-thumbnail' src={`/${message.author.avatar}`} />
                 {message.author.username} {message.created}
             </div>
             <div className={messageClassName}>{message.text}</div>

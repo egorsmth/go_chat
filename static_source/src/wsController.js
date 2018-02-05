@@ -2,9 +2,7 @@ const getWsConnection = (roomId, dispatcher) => {
     const ws = new WebSocket(`ws://${window.location.host}/chat/ws?id=${roomId}`); //
 
     ws.addEventListener('message', function(e) {
-        console.log('message comming!!!')
         const resp = JSON.parse(e.data);
-        console.log(resp)
         if (resp.status == 'success') {
             dispatcher(resp)
             return
@@ -36,8 +34,6 @@ const send = (ws, roomId, text, userId) => {
                 created: now.toISOString()
             },
         });
-        console.log('send!!!!')
-        console.log(message)
         ws.send(message);
     });
 }
@@ -51,8 +47,6 @@ const makeRead = (ws, roomId, messageIds) => {
                 roomId: roomId,
             }
         });
-        console.log('send!!!!')
-        console.log(message)
         ws.send(message)
     });
 }

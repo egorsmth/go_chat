@@ -12,7 +12,7 @@ export default class Message extends React.Component {
         })
         return <div className={messageClassName} >
             <div className='col-4'>
-            <img className='img-fluid' src={`/${message.author.avatar}`} />
+            <img className='avatar-thumbnail' src={`/${message.author.avatar}`} />
                 {message.author.username}
                 {message.created}
             </div>

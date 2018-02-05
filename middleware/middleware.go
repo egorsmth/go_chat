@@ -10,7 +10,7 @@ import (
 func GetUserFromSession(r *http.Request) (*models.User, error) {
 	sid, err := r.Cookie("sessionid")
 	if err != nil {
-		log.Println("sessionid not found in cookies", err)
+		log.Println("sessionid not found in cookies  s", err)
 		return nil, err
 	}
 	user, err := models.GetUserFromSession(sid.Value)
